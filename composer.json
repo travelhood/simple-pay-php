@@ -1,0 +1,26 @@
+{
+  "name": "travelhood/otp-simple-pay",
+  "description": "OTP Simple Pay API library",
+  "minimum-stability": "dev",
+  "license": "proprietary",
+  "authors": [
+    {
+      "name": "Lajos Bencz",
+      "email": "lajos.bencz@travelhood.com"
+    }
+  ],
+  "repositories": [
+    {
+      "type": "composer",
+      "url": "https://dev.packages.travelhood.com/"
+    }
+  ],
+  "require": {
+    "travelhood/logger": "^0.2"
+  },
+  "autoload": {
+    "psr-4": {
+      "Travelhood\\OtpSimplePay\\": "src/Travelhood/OtpSimplePay/"
+    }
+  }
+}
