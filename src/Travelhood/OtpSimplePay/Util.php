@@ -6,6 +6,8 @@ use InvalidArgumentException;
 
 abstract class Util
 {
+    const CHAR_BLACKLIST = ["'", "\\", "\""];
+
     /**
      * Generates HMAC hash from string
      * @param string $data
@@ -59,6 +61,14 @@ abstract class Util
             }
         }
         return $flat;
+    }
+
+    public static function cleanString($str, $blacklist='')
+    {
+        if($blacklist == '') {
+            $blacklist = self::CHAR_BLACKLIST;
+        }
+        return str_replace($blacklist, '', $str);
     }
 
 }

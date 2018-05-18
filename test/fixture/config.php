@@ -1,0 +1,6 @@
+<?php
+
+return [
+    'HUF_MERCHANT' => 'PUBLICTESTHUF',
+    'HUF_SECRET_KEY' => '101010514872470318621',
+];
