@@ -10,14 +10,6 @@ class Config implements ArrayAccess
 {
     const VALID_CURRENCIES = ['USD', 'EUR', 'HUF'];
 
-    const URL_LIVE = "https://secure.simplepay.hu/payment/";
-    const URL_SANDBOX = "https://sandbox.simplepay.hu/payment/";
-    const URL_LIVE_UPDATE = "order/lu.php";
-    const URL_INSTANT_DELIVERY_NOTIFICATION = "order/idn.php";
-    const URL_INSTANT_REFUND_NOTIFICATION = "order/irn.php";
-    const URL_INSTANT_ORDER_STATUS = "order/ios.php";
-    const URL_TOKENS = "order/tokens/";
-
     const DEFAULT_CONFIG = [
         'timeout' => 30,
         'merchant' => [],
