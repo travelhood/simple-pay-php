@@ -115,7 +115,7 @@ class Config implements ArrayAccess
      */
     public function setConfig($config)
     {
-        $this->_config = array_merge(self::DEFAULT_CONFIG, $config);
+        $this->_config = Util::mergeArray(self::DEFAULT_CONFIG, $config);
         $this->validate();
         return $this;
     }

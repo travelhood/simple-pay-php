@@ -46,7 +46,12 @@ abstract class Util
         return self::hmac($serial, $key);
     }
 
-    public static function flattenArray($array, $skip=[])
+    /**
+     * @param array $array
+     * @param array $skip
+     * @return array
+     */
+    public static function flattenArray($array, $skip = [])
     {
         $flat = [];
         foreach ($array as $name => $item) {
@@ -63,9 +68,36 @@ abstract class Util
         return $flat;
     }
 
-    public static function cleanString($str, $blacklist='')
+    /**
+     * @param array $array1
+     * @param array $array2
+     * @return array
+     */
+    public static function mergeArray($array1, $array2)
     {
-        if($blacklist == '') {
+        $merged = $array1;
+        foreach ($array2 as $key => &$value) {
+            if (is_array($value) && isset($merged[$key]) && is_array($merged[$key])) {
+                $merged[$key] = self::mergeArray($merged[$key], $value);
+            } else if (is_numeric($key)) {
+                if (!in_array($value, $merged)) {
+                    $merged[] = $value;
+                }
+            } else {
+                $merged[$key] = $value;
+            }
+        }
+        return $merged;
+    }
+
+    /**
+     * @param string $str
+     * @param string $blacklist
+     * @return string
+     */
+    public static function cleanString($str, $blacklist = '')
+    {
+        if ($blacklist == '') {
             $blacklist = self::CHAR_BLACKLIST;
         }
         return str_replace($blacklist, '', $str);

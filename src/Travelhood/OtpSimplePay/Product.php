@@ -2,8 +2,13 @@
 
 namespace Travelhood\OtpSimplePay;
 
-class Product
+use ArrayAccess;
+use Travelhood\OtpSimplePay\Exception\ProductException;
+
+class Product implements ArrayAccess
 {
+    const VALID_FIELDS = ['name', 'code', 'info', 'price', 'vat'];
+
     /** @var string */
     protected $_name = '';
 
@@ -14,27 +19,75 @@ class Product
     protected $_info = '';
 
     /** @var float */
-    protected $_price = 0.0;
-
-    /** @var int */
-    protected $_quantity = 1;
+    protected $_price = .0;
 
     /** @var float */
     protected $_vat = .0;
 
     /**
      * Product constructor.
-     * @param string $name
+     * @param array|string $name
      * @param string $code
+     * @param string $info
      * @param float $price
      * @param float $vat
      */
-    public function __construct($name, $code, $price, $vat = .0)
+    public function __construct($name='', $code='', $info='', $price=.0, $vat = .0)
     {
-        $this->_name = $name;
-        $this->_code = $code;
-        $this->_price = $price;
-        $this->_vat = $vat;
+        if(is_array($name)) {
+            $this->fromArray($name);
+        }
+        else {
+            $this->_name = $name;
+            $this->_code = $code;
+            $this->_info = $info;
+            $this->_price = $price;
+            $this->_vat = $vat;
+        }
+    }
+
+    /**
+     * @param string $offset
+     * @return bool
+     */
+    public function offsetExists($offset)
+    {
+        return in_array($offset, self::VALID_FIELDS);
+    }
+
+    /**
+     * @param string $offset
+     * @return mixed
+     */
+    public function offsetGet($offset)
+    {
+        if(!$this->offsetExists($offset)) {
+            return null;
+        }
+        return $this->{'_'.$offset};
+    }
+
+    /**
+     * @param string $offset
+     * @param mixed $value
+     * @throws ProductException
+     */
+    public function offsetSet($offset, $value)
+    {
+        if(!$this->offsetExists($offset)) {
+            throw new ProductException('Invalid field for Product: '.$offset);
+        }
+    }
+
+    /**
+     * @param string $offset
+     */
+    public function offsetUnset($offset)
+    {
+        if(!$this->offsetExists($offset)) {
+            return;
+        }
+        $this->{'_'.$offset} = null;
     }
 
     /**
@@ -112,24 +165,6 @@ class Product
     /**
      * @return int
      */
-    public function getQuantity()
-    {
-        return $this->_quantity;
-    }
-
-    /**
-     * @param int $quantity
-     * @return Product
-     */
-    public function setQuantity($quantity)
-    {
-        $this->_quantity = $quantity;
-        return $this;
-    }
-
-    /**
-     * @return int
-     */
     public function getVat()
     {
         return $this->_vat;
@@ -145,15 +180,30 @@ class Product
         return $this;
     }
 
+    /**
+     * @param array $array
+     * @return $this
+     */
+    public function fromArray(array $array)
+    {
+        foreach(self::VALID_FIELDS as $f) {
+            $this->{'_'.$f} = $array[$f];
+        }
+        return $this;
+    }
+
+    /**
+     * @return array
+     */
     public function toArray()
     {
         return [
-            'PNAME' => $this->_name,
-            'PCODE' => $this->_code,
-            'PINFO' => $this->_info,
-            'PRICE' => $this->_price,
-            'QTY' => $this->_quantity,
-            'VAT' => $this->_vat,
+            'name' => $this->_name,
+            'code' => $this->_code,
+            'info' => $this->_info,
+            'price' => $this->_price,
+            'vat' => $this->_vat,
         ];
     }
+
 }
