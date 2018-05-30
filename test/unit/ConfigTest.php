@@ -41,22 +41,39 @@ class ConfigTest extends BaseTest
     {
         $config = new \Travelhood\OtpSimplePay\Config([
             'merchant' => [
-                'HUF' => ['id'=>'id', 'secret'=>'secret'],
-                'EUR' => ['id'=>'id', 'secret'=>'secret'],
+                'HUF' => ['id'=>'idhuf', 'secret'=>'secrethuf'],
+                'EUR' => ['id'=>'ideur', 'secret'=>'secreteur'],
             ],
         ]);
         $this->assertEquals('HUF', $config->getCurrency());
 
         $config = new \Travelhood\OtpSimplePay\Config([
             'merchant' => [
-                'EUR' => ['id'=>'id', 'secret'=>'secret'],
-                'HUF' => ['id'=>'id', 'secret'=>'secret'],
+                'EUR' => ['id'=>'ideur', 'secret'=>'secreteur'],
+                'HUF' => ['id'=>'idhuf', 'secret'=>'secrethuf'],
             ],
         ]);
         $this->assertEquals('EUR', $config->getCurrency());
+        $this->assertEquals('ideur', $config['merchant_id']);
+        $this->assertEquals('secreteur', $config['merchant_secret']);
 
         $config->selectCurrency('HUF');
         $this->assertEquals('HUF', $config->getCurrency());
+        $this->assertEquals('idhuf', $config['merchant_id']);
+        $this->assertEquals('secrethuf', $config['merchant_secret']);
+    }
+
+    public function testReadonlyFields()
+    {
+        $config = new \Travelhood\OtpSimplePay\Config([
+            'merchant' => [
+                'HUF' => ['id'=>'idhuf', 'secret'=>'secrethuf'],
+                'EUR' => ['id'=>'ideur', 'secret'=>'secreteur'],
+            ],
+        ]);
+        $this->expectException(\Travelhood\OtpSimplePay\Exception\ConfigException::class);
+        $this->expectExceptionMessageRegExp("/^Cannot set read-only key: /");
+        $config['merchant_id'] = 'test';
     }
 
     public function testInvalidCurrency()

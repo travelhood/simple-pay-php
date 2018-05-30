@@ -90,7 +90,7 @@ class Config implements ArrayAccess
     public function offsetSet($offset, $value)
     {
         if($offset == 'merchant_id' || $offset == 'merchant_secret') {
-            throw new ConfigException('Cannot set read-only key '.$offset.'');
+            throw new ConfigException('Cannot set read-only key: '.$offset.'');
         }
         $this->_config[$offset] = $value;
     }
