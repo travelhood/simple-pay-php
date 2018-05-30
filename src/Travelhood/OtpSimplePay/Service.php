@@ -36,4 +36,9 @@ class Service extends Component
         }
         return parent::__get($name);
     }
+
+    public function createLiveUpdate()
+    {
+        return new LiveUpdate($this);
+    }
 }
