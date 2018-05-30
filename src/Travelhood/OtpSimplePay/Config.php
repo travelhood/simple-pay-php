@@ -2,34 +2,122 @@
 
 namespace Travelhood\OtpSimplePay;
 
-use ArrayObject;
-use ArrayIterator;
 use Travelhood\OtpSimplePay\Exception\ConfigException;
 
-class Config extends ArrayObject
+use ArrayAccess;
+
+class Config implements ArrayAccess
 {
-    const CURRENCIES = ['USD', 'EUR', 'HUF'];
-    const KEYS_REQUIRED = ['MERCHANT', 'SECRET_KEY'];
-    const DEFAULTS = [
-        'BASE_URL' => "https://secure.simplepay.hu/payment/", //LIVE system
-        'SANDBOX_URL' => "https://sandbox.simplepay.hu/payment/", //SANDBOX system
-        'LU_URL' => "order/lu.php",   //relative to BASE_URL
-        'ALU_URL' => "order/alu.php", //relative to BASE_URL
-        'IDN_URL' => "order/idn.php", //relative to BASE_URL
-        'IRN_URL' => "order/irn.php", //relative to BASE_URL
-        'IOS_URL' => "order/ios.php", //relative to BASE_URL
-        'OC_URL' => "order/tokens/"   //relative to BASE_URL
+    const VALID_CURRENCIES = ['USD', 'EUR', 'HUF'];
+
+    const URL_LIVE = "https://secure.simplepay.hu/payment/";
+    const URL_SANDBOX = "https://sandbox.simplepay.hu/payment/";
+    const URL_LIVE_UPDATE = "order/lu.php";
+    const URL_INSTANT_DELIVERY_NOTIFICATION = "order/idn.php";
+    const URL_INSTANT_REFUND_NOTIFICATION = "order/irn.php";
+    const URL_INSTANT_ORDER_STATUS = "order/ios.php";
+    const URL_TOKENS = "order/tokens/";
+
+    const DEFAULT_CONFIG = [
+        'timeout' => 30,
+        'merchant' => [],
     ];
 
+    const REQUIRED_MERCHANT_KEYS = ['id', 'secret'];
+
+    /**
+     * @param string $currency
+     * @return string
+     * @throws ConfigException
+     */
+    public static function sanitizeCurrency($currency)
+    {
+        $CUR = strtoupper(substr(trim($currency), 0, 3));
+        if(!in_array($CUR, self::VALID_CURRENCIES)) {
+            throw new ConfigException('Invalid currency: '.$currency);
+        }
+        return $CUR;
+    }
+
+    /** @var array */
+    protected $_config = [];
+
     /** @var string */
-    protected $_currency;
+    protected $_currency = '';
 
     /**
      * @param array $config
+     * @throws ConfigException
      */
-    public function __construct($config=[])
+    public function __construct($config)
     {
-        parent::__construct($config, ArrayObject::ARRAY_AS_PROPS, ArrayIterator::class);
+        $this->setConfig($config);
+    }
+
+    /**
+     * @param string $offset
+     * @return bool
+     */
+    public function offsetExists($offset)
+    {
+        if($offset == 'merchant_id' || $offset == 'merchant_secret') {
+            return true;
+        }
+        return array_key_exists($offset, $this->_config);
+    }
+
+    /**
+     * @param string $offset
+     * @return mixed
+     */
+    public function offsetGet($offset)
+    {
+        if($offset == 'merchant_id' || $offset == 'merchant_secret') {
+            $k = substr($offset, 9);
+            return $this['merchant'][$this->_currency][$k];
+        }
+        if($this->offsetExists($offset)) {
+            return $this->_config[$offset];
+        }
+        return null;
+    }
+
+    /**
+     * @param string $offset
+     * @param mixed $value
+     * @throws ConfigException
+     */
+    public function offsetSet($offset, $value)
+    {
+        if($offset == 'merchant_id' || $offset == 'merchant_secret') {
+            throw new ConfigException('Cannot set read-only key '.$offset.'');
+        }
+        $this->_config[$offset] = $value;
+    }
+
+    /**
+     * @param string $offset
+     */
+    public function offsetUnset($offset)
+    {
+        if($offset == 'merchant_id' || $offset == 'merchant_secret') {
+            return;
+        }
+        if($this->offsetExists($offset)) {
+            unset($this->_config[$offset]);
+        }
+    }
+
+    /**
+     * @param array $config
+     * @return $this
+     * @throws ConfigException
+     */
+    public function setConfig($config)
+    {
+        $this->_config = array_merge(self::DEFAULT_CONFIG, $config);
+        $this->validate();
+        return $this;
     }
 
     /**
@@ -37,9 +125,29 @@ class Config extends ArrayObject
      */
     public function validate()
     {
-        foreach(self::KEYS_REQUIRED as $key) {
-            if(!$this->offsetExists($key)) {
-                throw new ConfigException('Missing required config: '.$key);
+        if(!is_array($this['merchant']) || count($this['merchant']) < 1) {
+            throw new ConfigException('Invalid value for merchant');
+        }
+        foreach($this['merchant'] as $currency => $merchant) {
+            $CUR = self::sanitizeCurrency($currency);
+            if(strlen($this->_currency) < 1) {
+                $this->_currency = $CUR;
+            }
+            if($CUR != $currency) {
+                unset($this['merchant'][$currency]);
+                $this['merchant'][$CUR] = $merchant;
+                $currency = $CUR;
+            }
+            if(!is_array($merchant)) {
+                throw new ConfigException('Value for '.$currency.' merchant must be an array');
+            }
+            foreach(self::REQUIRED_MERCHANT_KEYS as $rmk) {
+                if(!array_key_exists($rmk, $merchant)) {
+                    throw new ConfigException('Missing key '.$rmk.' for '.$currency.' merchant');
+                }
+                if(strlen($merchant[$rmk]) < 1) {
+                    throw new ConfigException('Invalid '.$rmk.' value for '.$currency.' merchant');
+                }
             }
         }
     }
@@ -49,21 +157,13 @@ class Config extends ArrayObject
      * @return $this
      * @throws ConfigException
      */
-    public function setCurrency($currency)
+    public function selectCurrency($currency)
     {
-        if(!in_array($currency, self::CURRENCIES)) {
-            throw new ConfigException('Invalid currency: '.$currency);
+        $currency = self::sanitizeCurrency($currency);
+        if(!array_key_exists($currency, $this['merchant'])) {
+            throw new ConfigException('No such currency in config: '.$currency);
         }
         $this->_currency = $currency;
-        foreach(['MERCHANT', 'SECRET_KEY'] as $k) {
-            $ck = $currency.'_'.$k;
-            if(!$this->offsetExists($ck)) {
-                throw new ConfigException('Missing config: '.$ck);
-            }
-        }
-        $this['MERCHANT'] = $this[$currency.'_MERCHANT'];
-        $this['SECRET_KEY'] = $this[$currency.'_SECRET_KEY'];
-        $this->validate();
         return $this;
     }
 
