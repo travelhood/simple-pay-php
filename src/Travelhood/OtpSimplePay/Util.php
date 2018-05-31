@@ -103,4 +103,18 @@ abstract class Util
         return str_replace($blacklist, '', $str);
     }
 
+    /**
+     * UNSAFE!
+     * @param string $template
+     * @param array $dictionary
+     * @return string
+     */
+    public static function interpolateString($template, array $dictionary)
+    {
+        foreach($dictionary as $k=>$v) {
+            $template = str_replace('%{'.$k.'}', $v, $template);
+        }
+        return $template;
+    }
+
 }
