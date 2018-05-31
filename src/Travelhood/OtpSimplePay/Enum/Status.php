@@ -1,6 +1,6 @@
 <?php
 
-namespace Travelhood\OtpSimplePay;
+namespace Travelhood\OtpSimplePay\Enum;
 
 final class Status
 {

@@ -18,6 +18,14 @@ class Service extends Component
     /** @var Config */
     protected $_config;
 
+    protected function _getUrlBase()
+    {
+        if($this->config['live']) {
+            return self::URL_LIVE;
+        }
+        return self::URL_SANDBOX;
+    }
+
     public function __construct(Config $config)
     {
         parent::__construct($this);
@@ -35,6 +43,46 @@ class Service extends Component
                 return $this->_config;
         }
         return parent::__get($name);
+    }
+
+    public function getUrlLiveUpdate()
+    {
+        return $this->_getUrlBase().self::URL_LIVE_UPDATE;
+    }
+
+    public function getUrlInstantDeliveryNotification()
+    {
+        return $this->_getUrlBase().self::URL_INSTANT_DELIVERY_NOTIFICATION;
+    }
+
+    public function getUrlInstantRefundNotification()
+    {
+        return $this->_getUrlBase().self::URL_INSTANT_REFUND_NOTIFICATION;
+    }
+
+    public function getUrlInstantOrderStatus()
+    {
+        return $this->_getUrlBase().self::URL_INSTANT_ORDER_STATUS;
+    }
+
+    public function getUrlTokens()
+    {
+        return $this->_getUrlBase().self::URL_TOKENS;
+    }
+
+    public function pageBack()
+    {
+        return new Page\Back($this);
+    }
+
+    public function pageTimeout()
+    {
+        return new Page\Timeout($this);
+    }
+
+    public function createOrder($orderRef, $orderDate=null)
+    {
+        return new Order($this, $orderRef, $orderDate);
     }
 
     public function createLiveUpdate()

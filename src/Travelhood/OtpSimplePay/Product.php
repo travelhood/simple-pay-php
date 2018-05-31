@@ -206,4 +206,9 @@ class Product implements ArrayAccess
         ];
     }
 
+    public function __toString()
+    {
+        return $this->getName() . ' - ' . $this->getCode();
+    }
+
 }

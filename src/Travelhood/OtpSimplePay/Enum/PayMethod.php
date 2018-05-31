@@ -1,10 +1,13 @@
 <?php
 
-namespace Travelhood\OtpSimplePay;
+namespace Travelhood\OtpSimplePay\Enum;
 
 final class PayMethod
 {
+    // Card: Visa / MasterCard
     const CARD = 'CCVISAMC';
+
+    // Wire transfer
     const WIRE = 'WIRE';
 
     /**

@@ -1,10 +1,13 @@
 <?php
 
-namespace Travelhood\OtpSimplePay;
+namespace Travelhood\OtpSimplePay\Enum;
 
 final class Language
 {
+    // Hungarian
     const HU = 'HU';
+
+    // English
     const EN = 'EN';
 
     /**

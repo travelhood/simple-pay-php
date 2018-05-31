@@ -1,7 +1,14 @@
 <?php
 
+$devConfig = require __DIR__ . '/config.dev.php';
+
 return [
-    'timeout' => 30,
+    'live' => false,
+    'timeout' => 60,
+    'url' => [
+        'back' => 'http://'.$devConfig['server']['host'].':'.$devConfig['server']['port'].'/back.php',
+        'timeout' => 'http://'.$devConfig['server']['host'].':'.$devConfig['server']['port'].'/timeout.php',
+    ],
     'merchant' => [
         'HUF' => [
             'id' => 'PUBLICTESTHUF',

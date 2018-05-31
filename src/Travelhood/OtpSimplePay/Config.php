@@ -17,6 +17,9 @@ class Config implements ArrayAccess
 
     const REQUIRED_MERCHANT_KEYS = ['id', 'secret'];
 
+    const TIMEOUT_MIN = 60;
+    const TIMEOUT_MAX = 720;
+
     /**
      * @param string $currency
      * @return string
@@ -117,6 +120,9 @@ class Config implements ArrayAccess
      */
     public function validate()
     {
+        if($this['timeout'] < self::TIMEOUT_MIN || $this['timeout'] > self::TIMEOUT_MAX) {
+            throw new ConfigException('Timeout must be between '.self::TIMEOUT_MIN.' and '.self::TIMEOUT_MAX.' seconds');
+        }
         if(!is_array($this['merchant']) || count($this['merchant']) < 1) {
             throw new ConfigException('Invalid value for merchant');
         }
