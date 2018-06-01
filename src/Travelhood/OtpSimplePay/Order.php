@@ -139,12 +139,19 @@ class Order extends Component
             'DELIVERY_STATE' => $this->getDeliveryState(),
             'DELIVERY_COUNTRYCODE' => $this->getDeliveryCountryCode(),
         ];
-        $hashArray = [];
+        $hashInput = '';
         foreach(self::HASH_FIELDS as $field) {
-            $hashArray[$field] = $array[$field];
+            if(is_array($array[$field])) {
+                foreach($array[$field] as $v) {
+                    $hashInput.= strlen($v).$v;
+                }
+            }
+            else {
+                $v = $array[$field];
+                $hashInput.= strlen($v).$v;
+            }
         }
-        $hash = Util::hmacArray(Util::flattenArray($hashArray), $this->service->config['merchant_secret']);
-        $array['ORDER_HASH'] = $hash;
+        $array['ORDER_HASH'] = Util::hmac($hashInput, $this->service->config['merchant_secret']);
         return $array;
     }
 
