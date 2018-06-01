@@ -2,11 +2,9 @@
 
 namespace Travelhood\OtpSimplePay;
 
-use Countable;
-use SeekableIterator;
 use Travelhood\OtpSimplePay\Exception\ProductCollectionException;
 
-class ProductCollection implements Countable, SeekableIterator
+class ProductCollection implements ProductCollectionInterface
 {
     /** @var int */
     protected $_position = 0;
@@ -209,6 +207,26 @@ class ProductCollection implements Countable, SeekableIterator
     public function countProduct(Product $product)
     {
         return $this->countProductByCode($product->getCode());
+    }
+
+    public function __toString()
+    {
+        $s = '';
+        foreach($this as $product) {
+            $s.= ''.$product.' '.$this->countProduct($product).' '.$product->getPrice().''.PHP_EOL;
+        }
+        return $s;
+    }
+
+    public function toHtml()
+    {
+        $html = '<table>';
+        $html.= '<tr><thead><th>Product</th><th>Quantity</th><th>Price</th></thead></tr>';
+        foreach($this as $product) {
+            $html.= '<tr><td>'.$product->toHtml().'</td><td>'.$this->countProduct($product).'</td><td>'.$product->getPrice().'</td></tr>';
+        }
+        $html.= '</table>';
+        return $html;
     }
 
 }

@@ -2,24 +2,17 @@
 
 namespace Travelhood\OtpSimplePay;
 
-use Travelhood\OtpSimplePay\Exception\ControlMismatchException;
+use ArrayAccess;
+use Travelhood\OtpSimplePay\Exception\ConfigException;
 use Travelhood\OtpSimplePay\Exception\PageException;
+use Travelhood\OtpSimplePay\Exception\ControlMismatchException;
 
-abstract class Page extends Component
+abstract class Page extends Component implements ArrayAccess
 {
-    const KEY_ERROR = 'err';
-    const KEY_ORDER_REF = 'order_ref';
-    const KEY_ORDER_DATE = 'date';
-    const KEY_ORDER_CURRENCY = 'order_currency';
-    const KEY_RETURN_CODE = 'RC';
-    const KEY_RETURN_TEXT = 'RT';
-    const KEY_PAYMENT_NUMBER = 'payrefno';
-    const KEY_CONTROL_HASH = 'ctrl';
-
     /**
-     * @return string
+     * @return array
      */
-    abstract public function getMessage();
+    abstract public function getData();
 
     public function __construct(Service $service)
     {
@@ -27,23 +20,36 @@ abstract class Page extends Component
         $this->validate();
     }
 
-    public function validate()
+    public function offsetExists($offset)
     {
-        if(!array_key_exists(self::KEY_ORDER_CURRENCY, $_GET)) {
-            throw new PageException(self::KEY_ORDER_CURRENCY.' must be passed along in the url');
+        return array_key_exists($offset, $this->getData());
+    }
+
+    public function offsetGet($offset)
+    {
+        if(!$this->offsetExists($offset)) {
+            return null;
         }
-        $fullUrl = 'http'.((array_key_exists('HTTPS', $_SERVER) && $_SERVER['HTTPS']) ? 's' : '').'://'.$_SERVER['HTTP_HOST'].$_SERVER['REQUEST_URI'];
-        $fullUrl = preg_replace("/\&ctrl\=[a-zA-Z0-9]+$/", '', $fullUrl);
-        $this->service->config->selectCurrency($_GET[self::KEY_ORDER_CURRENCY]);
-        $hash = Util::hmac(strlen($fullUrl).$fullUrl,$this->service->config['merchant_secret']);
-        if($hash != $_GET[self::KEY_CONTROL_HASH]) {
-            throw new ControlMismatchException('Control variable mismatch!');
-        }
+        return $this->getData()[$offset];
+    }
+
+    public function offsetSet($offset, $value)
+    {
+        throw new PageException('Trying to set read-only variable');
+    }
+
+    public function offsetUnset($offset)
+    {
+        throw new PageException('Trying to set read-only variable');
     }
 
     public function toArray()
     {
-        return $_GET;
+        return $this->getData();
+    }
+
+    public function validate()
+    {
     }
 
     /**
@@ -51,11 +57,7 @@ abstract class Page extends Component
      */
     public function hasError()
     {
-        return (
-            array_key_exists(self::KEY_ERROR, $_GET) && strlen($_GET[self::KEY_ERROR])>0
-            ||
-            array_key_exists(self::KEY_RETURN_CODE, $_GET) && intval($_GET[self::KEY_RETURN_CODE]) > 1
-        );
+        return false;
     }
 
     /**
@@ -63,64 +65,8 @@ abstract class Page extends Component
      */
     public function getError()
     {
-        if($this->hasError()) {
-            if(array_key_exists(self::KEY_ERROR, $_GET)) {
-                return $_GET[self::KEY_ERROR];
-            }
-            return $_GET[self::KEY_RETURN_TEXT];
-        }
         return null;
     }
 
-    /**
-     * @return string|null
-     */
-    public function getOrderRef()
-    {
-        if(array_key_exists(self::KEY_ORDER_REF, $_GET)) {
-            return $_GET[self::KEY_ORDER_REF];
-        }
-        return null;
-    }
-
-    /**
-     * @return string|null
-     */
-    public function getOrderDate()
-    {
-        if(array_key_exists(self::KEY_ORDER_DATE, $_GET)) {
-            return $_GET[self::KEY_ORDER_DATE];
-        }
-        return null;
-    }
-
-    public function getPaymentNumber()
-    {
-        if(array_key_exists(self::KEY_PAYMENT_NUMBER, $_GET)) {
-            return $_GET[self::KEY_PAYMENT_NUMBER];
-        }
-        return null;
-    }
-
-    public function __toString()
-    {
-        $msg = '';
-        if($this->hasError()) {
-            $msg.= 'An error has occurred: ' . $this->getError();
-            $msg.= '<br/>' . PHP_EOL;
-        }
-        else {
-            $msg.= $this->getMessage();
-            $msg.= '<br/>' . PHP_EOL;
-            $msg.= "Payment number (SimplePay): ".$this->getPaymentNumber() . '<br/>' . PHP_EOL;
-        }
-        $msg.= "Order reference: ".$this->getOrderRef() . '<br/>' . PHP_EOL;
-        if($this->getOrderDate()) {
-            $msg .= "Order date: " . $this->getOrderDate() . '<br/>' . PHP_EOL;
-        }
-        $msg.= '<pre>';
-        $msg.= json_encode($this->toArray(), JSON_PRETTY_PRINT);
-        $msg.= '</pre>';
-        return $msg;
-    }
+    abstract public function __toString();
 }

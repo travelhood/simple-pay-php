@@ -20,9 +20,7 @@ $order
     ->setCountryCode('HU')
 ;
 
-foreach($order->products as $product) {
-    echo $product, '<br/>', PHP_EOL;
-}
+echo $order->toHtml();
 
 $liveUpdate = $simplePay->createLiveUpdate();
 echo $liveUpdate->generateForm($order);

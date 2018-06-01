@@ -5,9 +5,9 @@ namespace Travelhood\OtpSimplePay;
 use Travelhood\OtpSimplePay\Exception\OrderException;
 
 /**
- * @property ProductCollection $products
+ * @property ProductCollectionInterface $products
  */
-class Order extends Component
+class Order extends Component implements HtmlizeInterface
 {
     const HASH_FIELDS = [
         'MERCHANT',
@@ -25,7 +25,7 @@ class Order extends Component
         'PAY_METHOD',
     ];
 
-    /** @var ProductCollection|Product[] */
+    /** @var ProductCollectionInterface|ProductInterface[] */
     private $_products;
 
     protected $_orderRef = '';
@@ -153,6 +153,30 @@ class Order extends Component
         }
         $array['ORDER_HASH'] = Util::hmac($hashInput, $this->service->config['merchant_secret']);
         return $array;
+    }
+
+    public function __toString()
+    {
+        $s = $this->products.''.PHP_EOL;
+        foreach($this->toArray() as $k=>$v) {
+            if(is_array($v)) {
+                continue;
+            }
+            $s.= $k.': '.$v.PHP_EOL;
+        }
+        return $s;
+    }
+
+    public function toHtml()
+    {
+        $html = $this->products->toHtml();
+        foreach($this->toArray() as $k=>$v) {
+            if(is_array($v)) {
+                continue;
+            }
+            $html.= '<strong>'.$k.'</strong>: '.$v.'<br/>'.PHP_EOL;
+        }
+        return $html;
     }
 
     /**
@@ -313,7 +337,7 @@ class Order extends Component
     /**
      * @return int
      */
-    public function getOrderShipping(): int
+    public function getOrderShipping()
     {
         return $this->_orderShipping;
     }
@@ -331,7 +355,7 @@ class Order extends Component
     /**
      * @return int
      */
-    public function getDiscount(): int
+    public function getDiscount()
     {
         return $this->_discount;
     }

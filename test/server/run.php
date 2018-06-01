@@ -1,5 +1,7 @@
 <?php
 
+chdir(__DIR__);
+
 $devConfig = require __DIR__ . '/../fixture/config.dev.php';
 $address = $devConfig['server']['host'].':'.$devConfig['server']['port'];
 $command = "php -S {$address} -t ./public";

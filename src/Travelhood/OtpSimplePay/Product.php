@@ -2,10 +2,9 @@
 
 namespace Travelhood\OtpSimplePay;
 
-use ArrayAccess;
 use Travelhood\OtpSimplePay\Exception\ProductException;
 
-class Product implements ArrayAccess
+class Product implements ProductInterface
 {
     const VALID_FIELDS = ['name', 'code', 'info', 'price', 'vat'];
 
@@ -209,6 +208,11 @@ class Product implements ArrayAccess
     public function __toString()
     {
         return $this->getName() . ' - ' . $this->getCode();
+    }
+
+    public function toHtml()
+    {
+        return '<strong>'.$this->_name.' ('.$this->_code.')</strong> '.$this->_info.'';
     }
 
 }
