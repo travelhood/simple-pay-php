@@ -155,54 +155,99 @@ class Order extends Component
         return $array;
     }
 
+    /**
+     * Sets both billing and delivery first name
+     * @param string $value
+     * @return $this
+     */
     public function setFirstName($value)
     {
         $this->_billFirstName = $this->_deliveryFirstName = $value;
         return $this;
     }
 
+    /**
+     * Sets both billing and delivery last name
+     * @param string $value
+     * @return $this
+     */
     public function setLastName($value)
     {
         $this->_billLastName = $this->_deliveryLastName = $value;
         return $this;
     }
 
+    /**
+     * Sets billing email
+     * @param string $value
+     * @return $this
+     */
     public function setEmail($value)
     {
         $this->_billEmail = $value;
         return $this;
     }
 
+    /**
+     * Sets both billing and delivery phone
+     * @param string $value
+     * @return $this
+     */
     public function setPhone($value)
     {
         $this->_billPhone = $this->_deliveryPhone = $value;
         return $this;
     }
 
+    /**
+     * Sets both billing and delivery address
+     * @param string $value
+     * @return $this
+     */
     public function setAddress($value)
     {
         $this->_billAddress = $this->_deliveryAddress = $value;
         return $this;
     }
 
+    /**
+     * Sets both billing and delivery zip code
+     * @param string $value
+     * @return $this
+     */
     public function setZipCode($value)
     {
         $this->_billZipCode = $this->_deliveryZipCode = $value;
         return $this;
     }
 
+    /**
+     * Sets both billing and delivery city
+     * @param string $value
+     * @return $this
+     */
     public function setCity($value)
     {
         $this->_billCity = $this->_deliveryCity = $value;
         return $this;
     }
 
+    /**
+     * Sets both billing and delivery state
+     * @param string $value
+     * @return $this
+     */
     public function setState($value)
     {
         $this->_billState = $this->_deliveryState = $value;
         return $this;
     }
 
+    /**
+     * Sets both billing and delivery country code
+     * @param string $value
+     * @return $this
+     */
     public function setCountryCode($value)
     {
         $this->_billCountryCode = $this->_deliveryCountryCode = $value;
