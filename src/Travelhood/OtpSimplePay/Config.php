@@ -11,7 +11,7 @@ class Config implements ArrayAccess
     const VALID_CURRENCIES = ['USD', 'EUR', 'HUF'];
 
     const DEFAULT_CONFIG = [
-        'timeout' => 30,
+        'timeout' => 60,
         'merchant' => [],
     ];
 

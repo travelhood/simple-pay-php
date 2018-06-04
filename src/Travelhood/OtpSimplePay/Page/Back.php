@@ -19,6 +19,11 @@ class Back extends Page
     const KEY_PAYMENT_NUMBER = 'payrefno';
     const KEY_CONTROL_HASH = 'ctrl';
 
+    public function getData()
+    {
+        return $_GET;
+    }
+
     /**
      * @throws ConfigException
      * @throws ControlMismatchException

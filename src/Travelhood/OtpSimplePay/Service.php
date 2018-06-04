@@ -70,6 +70,24 @@ class Service extends Component
         return $this->_getUrlBase().self::URL_TOKENS;
     }
 
+    public function createOrder($orderRef, $orderDate=null)
+    {
+        return new Order($this, $orderRef, $orderDate);
+    }
+
+    public function createLiveUpdate()
+    {
+        return new LiveUpdate($this);
+    }
+
+    public function createRequest($url, $query=[])
+    {
+        if($this->config['curl']) {
+            return new Request\Curl($url, $query);
+        }
+        return new Request\FileGetContents($url, $query);
+    }
+
     public function pageBack()
     {
         return new Page\Back($this);
@@ -80,13 +98,19 @@ class Service extends Component
         return new Page\Timeout($this);
     }
 
-    public function createOrder($orderRef, $orderDate=null)
+    public function pageInstantPaymentNotification()
     {
-        return new Order($this, $orderRef, $orderDate);
+        return new Page\InstantPaymentNotification($this);
     }
 
-    public function createLiveUpdate()
+    public function requestInstantOrderStatus($orderRef)
     {
-        return new LiveUpdate($this);
+        $data = [
+            'MERCHANT' => $this->config['merchant_id'],
+            'REFNOEXT' => $orderRef,
+        ];
+        $hash = Util::hmacArray($data, $this->config['merchant_secret']);
+        $data['HASH'] = $hash;
+        return $this->createRequest($this->getUrlInstantOrderStatus(), $data)->fetch();
     }
 }

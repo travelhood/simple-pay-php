@@ -17,4 +17,16 @@ class BaseTest extends \PHPUnit\Framework\TestCase
         'price' => 2400,
         'vat' => .0,
     ];
+
+    /** @var \Travelhood\OtpSimplePay\Config */
+    public $config;
+
+    /** @var \Travelhood\OtpSimplePay\Service */
+    public $simplePay;
+
+    public function SetUp()
+    {
+        $this->config = new \Travelhood\OtpSimplePay\Config(require __DIR__ . '/fixture/config.php');
+        $this->simplePay = new \Travelhood\OtpSimplePay\Service($this->config);
+    }
 }
