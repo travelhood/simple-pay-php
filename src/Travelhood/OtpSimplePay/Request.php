@@ -66,15 +66,20 @@ abstract class Request implements RequestInterface
 
     /**
      * @param string $raw
+     * @param callable $parser
      * @return array
      */
-    public function parse($raw)
+    public function parse($raw, $parser=null)
     {
+        if($parser) {
+            return $parser($raw);
+        }
         return (array) simplexml_load_string($raw);
     }
 
     /**
+     * @param callable $parser
      * @return mixed
      */
-    abstract public function fetch();
+    abstract public function fetch($parser=null);
 }

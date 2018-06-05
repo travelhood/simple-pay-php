@@ -26,7 +26,13 @@ class BaseTest extends \PHPUnit\Framework\TestCase
 
     public function SetUp()
     {
-        $this->config = new \Travelhood\OtpSimplePay\Config(require __DIR__ . '/fixture/config.php');
+        $configArray = require __DIR__ . '/fixture/config.php';
+        if(is_file(__DIR__ . '/fixture/config.local.php')) {
+            $configArrayLocale = require __DIR__ . '/fixture/config.local.php';
+            $configArray = \Travelhood\OtpSimplePay\Util::mergeArray($configArray, $configArrayLocale);
+        }
+        $this->config = new \Travelhood\OtpSimplePay\Config($configArray);
+        $this->config->selectCurrency('HUF');
         $this->simplePay = new \Travelhood\OtpSimplePay\Service($this->config);
     }
 }

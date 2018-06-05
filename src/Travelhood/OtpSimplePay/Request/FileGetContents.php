@@ -6,7 +6,7 @@ use Travelhood\OtpSimplePay\Request;
 
 class FileGetContents extends Request
 {
-    public function fetch()
+    public function fetch($parser=null)
     {
         $options = array(
             'http' => array(
@@ -17,6 +17,6 @@ class FileGetContents extends Request
         );
         $context = stream_context_create($options);
         $raw = file_get_contents($this->_url, true, $context);
-        return $this->parse($raw);
+        return $this->parse($raw, $parser);
     }
 }

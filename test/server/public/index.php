@@ -23,5 +23,5 @@ $order
 
 echo $order->toHtml();
 
-$liveUpdate = $simplePay->createLiveUpdate();
+$liveUpdate = $simplePay->liveUpdate();
 echo $liveUpdate->generateForm($order);

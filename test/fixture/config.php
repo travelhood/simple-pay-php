@@ -3,6 +3,7 @@
 $devConfig = require __DIR__ . '/config.dev.php';
 
 return [
+    'curl' => true,
     'live' => false,
     'timeout' => 60,
     'url' => [

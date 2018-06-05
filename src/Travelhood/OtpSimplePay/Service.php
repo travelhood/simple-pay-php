@@ -75,11 +75,6 @@ class Service extends Component
         return new Order($this, $orderRef, $orderDate);
     }
 
-    public function createLiveUpdate()
-    {
-        return new LiveUpdate($this);
-    }
-
     public function createRequest($url, $query=[])
     {
         if($this->config['curl']) {
@@ -103,14 +98,13 @@ class Service extends Component
         return new Page\InstantPaymentNotification($this);
     }
 
-    public function requestInstantOrderStatus($orderRef)
+    public function liveUpdate()
     {
-        $data = [
-            'MERCHANT' => $this->config['merchant_id'],
-            'REFNOEXT' => $orderRef,
-        ];
-        $hash = Util::hmacArray($data, $this->config['merchant_secret']);
-        $data['HASH'] = $hash;
-        return $this->createRequest($this->getUrlInstantOrderStatus(), $data)->fetch();
+        return new LiveUpdate($this);
+    }
+
+    public function instantOrderStatus($orderRef, $currency=null)
+    {
+        return new InstantOrderStatus($this, $orderRef, $currency);
     }
 }

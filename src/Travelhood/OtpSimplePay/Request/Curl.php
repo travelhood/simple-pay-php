@@ -6,7 +6,7 @@ use Travelhood\OtpSimplePay\Request;
 
 class Curl extends Request
 {
-    public function fetch()
+    public function fetch($parser=null)
     {
         $ch = curl_init();
         curl_setopt($ch, CURLOPT_URL, $this->_url);
@@ -24,6 +24,6 @@ class Curl extends Request
         curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true);
         $raw = curl_exec($ch);
         curl_close($ch);
-        return $this->parse($raw);
+        return $this->parse($raw, $parser);
     }
 }

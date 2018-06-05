@@ -491,6 +491,7 @@ class SimpleBase
  */
 class SimpleTransaction extends SimpleBase
 {
+    public $curl = true;
     public $result;
     public $targetUrl;
     public $baseUrl;

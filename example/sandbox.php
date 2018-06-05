@@ -1,134 +1,48 @@
 <?php
 
-
-function parse_http_response ($string)
-{
-    $headers = [];
-//    $content = '';
-    $str = strtok($string, "\n");
-    $h = null;
-    while ($str !== false) {
-        if ($h and trim($str) === '') {
-            $h = false;
-            continue;
-        }
-        if ($h !== false and false !== strpos($str, ':')) {
-            $h = true;
-            list($headerName, $headerValue) = explode(':', trim($str), 2);
-            $headerName = strtolower($headerName);
-            $headerValue = ltrim($headerValue);
-            if (isset($headers[$headerName]))
-                $headers[$headerName] .= ',' . $headerValue;
-            else
-                $headers[$headerName] = $headerValue;
-        }
-//        if ($h === false) {
-//            $content .= $str."\n";
-//        }
-        $str = strtok("\n");
-    }
-    return $headers;
-}
-
 require_once __DIR__ . '/../vendor/autoload.php';
 
-const BASE_URL = 'https://unstable.travelhood.com/pay/';
+$url = 'https://sandbox.simplepay.hu/payment/order/ios.php';
+$data = array(
+    'MERCHANT' => 'PUBLICTESTHUF',
+    'REFNOEXT' => '101010514615913074586',
+    //'HASH' => '9607a566c832821b8447eea204e6da1e'
+);
 
-$config = include __DIR__ . '/../test/fixture/config.php';
-$config = new \Travelhood\OtpSimplePay\Config($config);
-$config->setCurrency('HUF');
+$hash = \Travelhood\OtpSimplePay\Util::hmacArray($data, 'FxDa5w314kLlNseq2sKuVwaqZshZT5d6');
+$data['HASH'] = $hash;
 
-$orderId = '101010514872470318621';
-$orderDate = '2017-02-16 12:10:31';
+var_dump($data);
 
-$data = [
-    'MERCHANT' => $config['MERCHANT'],
-    'ORDER_REF' => $orderId,
-    'ORDER_DATE' => $orderDate,
-    'PRICES_CURRENCY' => $config->getCurrency(),
-    'ORDER_SHIPPING' => 0,
-    'DISCOUNT' => 0,
-    'PAY_METHOD' => 'CCVISAMC',
-    'LANGUAGE' => 'HU',
-    'ORDER_TIMEOUT' => 300,
-    'TIMEOUT_URL' => BASE_URL.'timeout/?id='.$orderId.'&currency='.$config->getCurrency(),
-    'BACK_REF' => BASE_URL.'back/?id='.$orderId.'&currency='.$config->getCurrency(),
-];
+$curlData = curl_init();
+curl_setopt($curlData, CURLOPT_URL, $url);
+curl_setopt($curlData, CURLOPT_POST, true);
+curl_setopt($curlData, CURLOPT_POSTFIELDS, http_build_query($data));
+curl_setopt($curlData, CURLOPT_RETURNTRANSFER, true);
+curl_setopt($curlData, CURLOPT_USERAGENT, 'curl');
+curl_setopt($curlData, CURLOPT_TIMEOUT, 60);
+curl_setopt($curlData, CURLOPT_FOLLOWLOCATION, true);
+$resultXml = curl_exec($curlData);
+curl_close($curlData);
+$result = (array)simplexml_load_string($resultXml);
+var_dump($result);
 
-$adr = [
-    'FNAME' => 'Tester',
-    'LNAME' => 'SimplePay',
-//    'EMAIL' => 'email@example.com',
-    'PHONE' => '36201234567',
-    'ADDRESS' => 'First line address',
-    'ZIPCODE' => '1234',
-    'CITY' => 'City',
-    'STATE' => 'State',
-    'COUNTRYCODE' => 'HU',
-];
+exit;
 
-foreach($adr as $ak=>$av) {
-    foreach(['BILL', 'DELIVERY'] as $tk) {
-        $data[$tk.'_'.$ak] = $av;
-    }
-}
-$data['BILL_EMAIL'] = 'email@example.com';
+require_once __DIR__ . '/vendor-classes.php';
 
-$data['ORDER_PNAME'] = [
-    'ÁRVÍZTŰRŐ TÜKÖRFÚRÓGÉP #1',
-    'ÁRVÍZTŰRŐ TÜKÖRFÚRÓGÉP #2',
-];
-$data['ORDER_PCODE'] = [
-    '123',
-    '456',
-];
-$data['ORDER_PINFO'] = [
-    'ÁRVÍZTŰRŐ TÜKÖRFÚRÓGÉP',
-    'ÁRVÍZTŰRŐ TÜKÖRFÚRÓGÉP',
-];
-$data['ORDER_PRICE'] = [
-    82000,
-    57000,
-];
-$data['ORDER_QTY'] = [
-    1,
-    2,
-];
-$data['ORDER_VAT'] = [
-    0,
-    0,
-];
-
-$flatData = \Travelhood\OtpSimplePay\Util::flattenArray($data);
-$hash = \Travelhood\OtpSimplePay\Util::hmacArray($flatData, $config['SECRET_KEY']);
-
-$data['ORDER_HASH'] = $hash;
-
-//print_r($data);
-
-$curl = curl_init(\Travelhood\OtpSimplePay\Config::DEFAULTS['SANDBOX_URL'].\Travelhood\OtpSimplePay\Config::DEFAULTS['LU_URL']);
-//$curl = curl_init('https://unstable.travelhood.com/pay/lu');
-curl_setopt_array($curl, [
-    CURLOPT_POST => 1,
-    CURLOPT_POSTFIELDS => http_build_query($data),
-]);
-curl_setopt($curl, CURLOPT_RETURNTRANSFER, 1);
-curl_setopt($curl, CURLOPT_VERBOSE, 0);
-curl_setopt($curl, CURLOPT_HEADER, 1);
-
-$response = curl_exec($curl);
-$errno = curl_errno($curl);
-$error = curl_error($curl);
-if($errno !== 0) {
-    throw new RuntimeException($error, $errno);
+function ios($orderNumber)
+{
+    $ios = new SimpleIos([
+        'HUF_MERCHANT' => 'PUBLICTESTHUF',
+        'HUF_SECRET_KEY' => 'FxDa5w314kLlNseq2sKuVwaqZshZT5d6',
+    ], 'HUF', $orderNumber);
+    $ios->runIos();
+    var_dump($ios->status);
 }
 
-$header_size = curl_getinfo($curl, CURLINFO_HEADER_SIZE);
 
-if(is_resource($curl)) {
-    curl_close($curl);
+foreach (['101010514615913074586', 'TOf945f691040b77a29f19b35c6dbbd5e9', '99181132', 'TOcc2b7511c5798f0e4587ee936a749a69', '99180427'] as $orderNumber) {
+    ios($orderNumber);
 }
 
-$header = parse_http_response(substr($response, 0, $header_size));
-$body = substr($response, $header_size);
-var_dump(['header'=>$header,'body'=>$body]);
