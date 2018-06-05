@@ -4,19 +4,8 @@ namespace Travelhood\OtpSimplePay;
 
 use Travelhood\OtpSimplePay\Exception\InstantOrderStatusException;
 
-class InstantOrderStatus extends Component
+class InstantOrderStatus extends Instant
 {
-    /** @var array */
-    protected $_data;
-
-    protected function _getData($key)
-    {
-        if(array_key_exists($key, $this->_data)) {
-            return $this->_data[$key];
-        }
-        return null;
-    }
-
     public function __construct(Service $service, $orderRef, $currency=null)
     {
         parent::__construct($service);
@@ -37,26 +26,6 @@ class InstantOrderStatus extends Component
             throw new InstantOrderStatusException('Failed to parse response');
         }
         $this->validate();
-    }
-
-    public function validate()
-    {
-        $data = $this->_data;
-        unset($data['HASH']);
-        $hash = Util::hmacArray($data,$this->service->config['merchant_secret']);
-        if($hash != $this->_data['HASH']) {
-            throw new InstantOrderStatusException('Failed to validate hash');
-        }
-    }
-
-    public function getOrderDate()
-    {
-        return $this->_getData('ORDER_DATE');
-    }
-
-    public function getSimplePayRef()
-    {
-        return $this->_getData('REFNO');
     }
 
     public function getOrderRef()

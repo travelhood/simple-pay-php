@@ -112,4 +112,9 @@ class Service extends Component
     {
         return new InstantDeliveryNotification($this, $simplePayRef, $amount, $currency);
     }
+
+    public function instantRefundNotification()
+    {
+
+    }
 }
