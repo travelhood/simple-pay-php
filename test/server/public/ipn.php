@@ -3,6 +3,6 @@
 require_once __DIR__ . '/../bootstrap.php';
 global $simplePay;
 
-echo $simplePay->pageInstantPaymentNotification();
+echo $simplePay->pagePaymentNotification();
 
-echo '<a href="/">Back</a>';
+echo '<hr/><a href="/">Back</a>';

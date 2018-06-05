@@ -1,10 +1,15 @@
 <?php
 
-namespace Travelhood\OtpSimplePay;
+namespace Travelhood\OtpSimplePay\Instant;
 
-class InstantRefundNotification extends Instant
+use Travelhood\OtpSimplePay\Service;
+use Travelhood\OtpSimplePay\Instant;
+use Travelhood\OtpSimplePay\Util;
+
+
+class DeliveryNotification extends Instant
 {
-    public function __construct(Service $service, $simplePayRef, $orderAmount, $refundAmount, $currency=null)
+    public function __construct(Service $service, $simplePayRef, $amount, $currency=null)
     {
         parent::__construct($service);
         if($currency) {
@@ -13,15 +18,15 @@ class InstantRefundNotification extends Instant
         $query = [
             'MERCHANT' => $this->service->config['merchant_id'],
             'ORDER_REF' => $simplePayRef,
-            'ORDER_AMOUNT' => $orderAmount,
+            'ORDER_AMOUNT' => $amount,
             'ORDER_CURRENCY' => $this->service->config->getCurrency(),
-            'IRN_DATE' => date('Y-m-d H:i:s'),
-            'AMOUNT' => $orderAmount,
+            'DATE_IDN' => date('Y-m-d H:i:s'),
         ];
         $hash = Util::hmacArray($query, $this->service->config['merchant_secret']);
         $query['ORDER_HASH'] = $hash;
-        $request = $this->service->createRequest($this->service->getUrlInstantRefundNotification(), $query);
+        $request = $this->service->createRequest($this->service->getUrlInstantDeliveryNotification(), $query);
         $this->_data = $request->fetch([$this, 'parse']);
         $this->validate();
     }
+
 }

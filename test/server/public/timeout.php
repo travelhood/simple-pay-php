@@ -5,4 +5,4 @@ global $simplePay;
 
 echo $simplePay->pageTimeout();
 
-echo '<a href="/">Back</a>';
+echo '<hr/><a href="/">Back</a>';

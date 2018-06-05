@@ -83,6 +83,11 @@ class Service extends Component
         return new Request\FileGetContents($url, $query);
     }
 
+    public function liveUpdate()
+    {
+        return new LiveUpdate($this);
+    }
+
     public function pageBack()
     {
         return new Page\Back($this);
@@ -93,28 +98,23 @@ class Service extends Component
         return new Page\Timeout($this);
     }
 
-    public function pageInstantPaymentNotification()
+    public function pagePaymentNotification()
     {
-        return new Page\InstantPaymentNotification($this);
-    }
-
-    public function liveUpdate()
-    {
-        return new LiveUpdate($this);
+        return new Page\PaymentNotification($this);
     }
 
     public function instantOrderStatus($orderRef, $currency=null)
     {
-        return new InstantOrderStatus($this, $orderRef, $currency);
+        return new Instant\OrderStatus($this, $orderRef, $currency);
     }
 
     public function instantDeliveryNotification($simplePayRef, $amount, $currency=null)
     {
-        return new InstantDeliveryNotification($this, $simplePayRef, $amount, $currency);
+        return new Instant\DeliveryNotification($this, $simplePayRef, $amount, $currency);
     }
 
-    public function instantRefundNotification()
+    public function instantRefundNotification($simplePayRef, $orderAmount, $refundAmount, $currency=null)
     {
-
+        return new Instant\RefundNotification($this, $simplePayRef, $orderAmount, $refundAmount, $currency);
     }
 }

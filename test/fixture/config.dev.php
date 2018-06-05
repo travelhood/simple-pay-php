@@ -2,7 +2,8 @@
 
 return [
     'server' => [
-        'host' => 'localhost',
-        'port' => 8080,
+        'listen' => '0.0.0.0',
+        'domain' => 'office.bonic.hu',
+        'port' => 80,
     ],
 ];

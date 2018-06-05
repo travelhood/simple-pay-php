@@ -15,12 +15,12 @@ abstract class Instant extends Component
         return null;
     }
 
-    public function getHashKey()
+    protected function _getHashKey()
     {
         return 'HASH';
     }
 
-    public function getKeyMap()
+    protected function _getKeyMap()
     {
         return [
             'REFNO',
@@ -35,12 +35,12 @@ abstract class Instant extends Component
     {
         $raw = substr($raw, 10, -11); // strip <epayment> tag
         $split = explode('|', $raw);
-        return array_combine($this->getKeyMap(), $split);
+        return array_combine($this->_getKeyMap(), $split);
     }
 
     function validate()
     {
-        $key = $this->getHashKey();
+        $key = $this->_getHashKey();
         $data = $this->_data;
         unset($data[$key]);
         $hash = Util::hmacArray($data,$this->service->config['merchant_secret']);

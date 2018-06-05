@@ -1,10 +1,13 @@
 <?php
 
-namespace Travelhood\OtpSimplePay;
+namespace Travelhood\OtpSimplePay\Instant;
 
+use Travelhood\OtpSimplePay\Service;
+use Travelhood\OtpSimplePay\Instant;
+use Travelhood\OtpSimplePay\Util;
 use Travelhood\OtpSimplePay\Exception\InstantOrderStatusException;
 
-class InstantOrderStatus extends Instant
+class OrderStatus extends Instant
 {
     public function __construct(Service $service, $orderRef, $currency=null)
     {

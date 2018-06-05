@@ -6,7 +6,7 @@ use Travelhood\OtpSimplePay\Exception\InstantPaymentNotificationException;
 use Travelhood\OtpSimplePay\Page;
 use Travelhood\OtpSimplePay\Util;
 
-class InstantPaymentNotification extends Page
+class PaymentNotification extends Page
 {
     protected $_date = null;
 
@@ -29,6 +29,9 @@ class InstantPaymentNotification extends Page
     public function validate()
     {
         $data = $this->getData();
+        if(!array_key_exists('CURRENCY', $data)) {
+            throw new InstantPaymentNotificationException('Invalid request received');
+        }
         $this->service->config->selectCurrency($data['CURRENCY']);
         $check = $data;
         unset($check['HASH']);

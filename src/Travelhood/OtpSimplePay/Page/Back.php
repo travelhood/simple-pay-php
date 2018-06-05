@@ -35,7 +35,14 @@ class Back extends Page
             throw new PageException(self::KEY_ORDER_CURRENCY.' must be passed along in the url');
         }
         if($this->offsetExists(self::KEY_CONTROL_HASH)) {
-            $fullUrl = 'http'.((array_key_exists('HTTPS', $_SERVER) && $_SERVER['HTTPS']) ? 's' : '').'://'.$_SERVER['HTTP_HOST'].$_SERVER['REQUEST_URI'];
+            $port = $_SERVER['SERVER_PORT'];
+            if($port == 80) {
+                $port = '';
+            }
+            else {
+                $port = ':'.$port;
+            }
+            $fullUrl = 'http'.((array_key_exists('HTTPS', $_SERVER) && $_SERVER['HTTPS']) ? 's' : '').'://'.$_SERVER['HTTP_HOST'].$port.$_SERVER['REQUEST_URI'];
             $fullUrl = preg_replace("/\&ctrl\=[a-zA-Z0-9]+$/", '', $fullUrl);
             $this->service->config->selectCurrency($this[self::KEY_ORDER_CURRENCY]);
             $hash = Util::hmac(strlen($fullUrl).$fullUrl,$this->service->config['merchant_secret']);
@@ -66,7 +73,7 @@ class Back extends Page
     }
 
     /**
-     * @return string|null
+     * @return string
      */
     public function getOrderRef()
     {
@@ -74,14 +81,22 @@ class Back extends Page
     }
 
     /**
-     * @return string|null
+     * @return string
      */
     public function getOrderDate()
     {
         return $this[self::KEY_ORDER_DATE];
     }
 
-    public function getPaymentNumber()
+    /**
+     * @return string
+     */
+    public function getOrderCurrency()
+    {
+        return $this[self::KEY_ORDER_CURRENCY];
+    }
+
+    public function getSimplePayRef()
     {
         return $this[self::KEY_PAYMENT_NUMBER];
     }
@@ -96,7 +111,7 @@ class Back extends Page
         else {
             $msg.= 'Successful transaction!';
             $msg.= '<br/>' . PHP_EOL;
-            $msg.= "Payment number (SimplePay): ".$this->getPaymentNumber() . '<br/>' . PHP_EOL;
+            $msg.= "Payment number (SimplePay): ".$this->getSimplePayRef() . '<br/>' . PHP_EOL;
         }
         $msg.= "Order reference: ".$this->getOrderRef() . '<br/>' . PHP_EOL;
         if($this->getOrderDate()) {

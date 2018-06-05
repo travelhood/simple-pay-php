@@ -2,13 +2,21 @@
 
 $devConfig = require __DIR__ . '/config.dev.php';
 
+$port = intval($devConfig['server']['port']);
+if($port != 80) {
+    $port = ':'.$port;
+}
+else {
+    $port = '';
+}
+
 return [
     'curl' => true,
     'live' => false,
     'timeout' => 60,
     'url' => [
-        'back' => 'http://'.$devConfig['server']['host'].':'.$devConfig['server']['port'].'/back.php',
-        'timeout' => 'http://'.$devConfig['server']['host'].':'.$devConfig['server']['port'].'/timeout.php',
+        'back' => 'http://'.$devConfig['server']['domain'].$port.'/back.php',
+        'timeout' => 'http://'.$devConfig['server']['domain'].$port.'/timeout.php',
     ],
     'merchant' => [
         'HUF' => [

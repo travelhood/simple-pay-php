@@ -3,6 +3,13 @@
 require_once __DIR__ . '/../bootstrap.php';
 global $simplePay;
 
-echo $simplePay->pageBack();
+$page = $simplePay->pageBack();
 
-echo '<a href="/">Back</a>';
+echo $page;
+
+$status = $simplePay->instantOrderStatus($page->getOrderRef(), $page->getOrderCurrency());
+
+echo $status->getOrderStatus(), '<br/>';
+echo $status->getResponseText(), '<br/>';
+
+echo '<hr/><a href="/">Back</a>';
