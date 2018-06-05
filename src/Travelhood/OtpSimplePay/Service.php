@@ -107,4 +107,9 @@ class Service extends Component
     {
         return new InstantOrderStatus($this, $orderRef, $currency);
     }
+
+    public function instantDeliveryNotification($simplePayRef, $amount, $currency=null)
+    {
+        return new InstantDeliveryNotification($this, $simplePayRef, $amount, $currency);
+    }
 }
