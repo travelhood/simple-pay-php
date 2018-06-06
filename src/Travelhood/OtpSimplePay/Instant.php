@@ -7,7 +7,7 @@ abstract class Instant extends Component
     /** @var array */
     protected $_data;
 
-    protected function _getData($key)
+    protected function _getDataKey($key)
     {
         if(array_key_exists($key, $this->_data)) {
             return $this->_data[$key];
@@ -31,10 +31,15 @@ abstract class Instant extends Component
         ];
     }
 
+    public function getData()
+    {
+        return $this->_data;
+    }
+
     public function parse($raw)
     {
-        $raw = substr($raw, 10, -11); // strip <epayment> tag
-        $split = explode('|', $raw);
+        $raw2 = substr($raw, 10, -11); // strip <epayment> tag
+        $split = explode('|', $raw2);
         return array_combine($this->_getKeyMap(), $split);
     }
 
@@ -54,21 +59,21 @@ abstract class Instant extends Component
 
     public function getSimplePayRef()
     {
-        return $this->_getData('REFNO');
+        return $this->_getDataKey('REFNO');
     }
 
     public function getResponseCode()
     {
-        return $this->_getData('RC');
+        return $this->_getDataKey('RC');
     }
 
     public function getResponseText()
     {
-        return $this->_getData('RT');
+        return $this->_getDataKey('RT');
     }
 
     public function getDate()
     {
-        return $this->_getData('DATE');
+        return $this->_getDataKey('DATE');
     }
 }

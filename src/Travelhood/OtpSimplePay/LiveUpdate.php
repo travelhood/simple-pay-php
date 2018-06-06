@@ -2,6 +2,8 @@
 
 namespace Travelhood\OtpSimplePay;
 
+use Travelhood\OtpSimplePay\Exception\LiveUpdateException;
+
 /**
  * @property ProductCollection $products
  */
@@ -15,12 +17,13 @@ class LiveUpdate extends Component
 
     /**
      * @param Order $order
-     * @param string $formId
-     * @param string $submitText
+     * @param null $formId
+     * @param string $submit
      * @return string
      * @throws Exception\OrderException
+     * @throws LiveUpdateException
      */
-    public function generateForm(Order $order, $formId=null, $submitText=self::DEFAULT_SUBMIT_TEXT)
+    public function generateForm(Order $order, $formId=null, $submit=self::DEFAULT_SUBMIT_TEXT)
     {
         if(!$formId) {
             $formId = self::DEFAULT_FORM_ID . '-' . $order->getOrderRef();
@@ -44,10 +47,24 @@ class LiveUpdate extends Component
                 ]);
             }
         }
-        $inputs.= Util::interpolateString(self::HTML_SUBMIT, [
-            'form' => $formId,
-            'html' => $submitText,
-        ]);
+        if(is_callable($submit)) {
+            $inputs.= trim($submit($formId)).PHP_EOL;
+        }
+        elseif(is_string($submit)) {
+            $n = substr_count($submit, '<');
+            if($n > 0 && $n == substr_count($submit, '>')) {
+                $inputs.= trim($submit).PHP_EOL;
+            }
+            else {
+                $inputs.= Util::interpolateString(self::HTML_SUBMIT, [
+                    'form' => $formId,
+                    'html' => $submit,
+                ]);
+            }
+        }
+        else {
+            throw new LiveUpdateException('Invalid parameter: $submit');
+        }
         return Util::interpolateString(self::HTML_FORM, [
             'action' => $this->service->getUrlLiveUpdate(),
             'method' => 'POST',

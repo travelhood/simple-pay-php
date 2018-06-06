@@ -5,4 +5,3 @@ global $simplePay;
 
 echo $simplePay->pagePaymentNotification();
 
-echo '<hr/><a href="/">Back</a>';

@@ -117,9 +117,6 @@ class Back extends Page
         if($this->getOrderDate()) {
             $msg .= "Order date: " . $this->getOrderDate() . '<br/>' . PHP_EOL;
         }
-        $msg.= '<pre>';
-        $msg.= json_encode($this->toArray(), JSON_PRETTY_PRINT);
-        $msg.= '</pre>';
         return $msg;
     }
 }

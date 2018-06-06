@@ -4,7 +4,7 @@ namespace Travelhood\OtpSimplePay;
 
 use ArrayAccess;
 
-interface ProductInterface extends ArrayAccess, HtmlizeInterface
+interface ProductInterface extends ArrayAccess
 {
     function setName($name);
 

@@ -33,17 +33,17 @@ class OrderStatus extends Instant
 
     public function getOrderRef()
     {
-        return $this->_getData('REFNOEXT');
+        return $this->_getDataKey('REFNOEXT');
     }
 
     public function getOrderStatus()
     {
-        return $this->_getData('ORDER_STATUS');
+        return $this->_getDataKey('ORDER_STATUS');
     }
 
     public function getPayMethod()
     {
-        return $this->_getData('PAYMETHOD');
+        return $this->_getDataKey('PAYMETHOD');
     }
 
 }

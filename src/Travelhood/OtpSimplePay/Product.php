@@ -210,9 +210,4 @@ class Product implements ProductInterface
         return $this->getName() . ' - ' . $this->getCode();
     }
 
-    public function toHtml()
-    {
-        return '<strong>'.$this->_name.' ('.$this->_code.')</strong> '.$this->_info.'';
-    }
-
 }

@@ -5,13 +5,15 @@ namespace Travelhood\OtpSimplePay;
 use Countable;
 use SeekableIterator;
 
-interface ProductCollectionInterface extends Countable, SeekableIterator, HtmlizeInterface
+interface ProductCollectionInterface extends Countable, SeekableIterator
 {
     function clear();
 
     function findProductByCode($code);
 
-    function findProduct(Product $product);
+    function findIndexByCode($code);
+
+    function findIndex(Product $product);
 
     function addProduct(Product $product, $quantity=1);
 
@@ -26,6 +28,12 @@ interface ProductCollectionInterface extends Countable, SeekableIterator, Htmliz
     function countProductByCode($code);
 
     function countProduct(Product $product);
+
+    function sumProductByCode($code, $gross=true);
+
+    function sumProduct(Product $product, $gross=true);
+
+    function sum($gross=true);
 
     function __toString();
 }

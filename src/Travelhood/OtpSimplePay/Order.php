@@ -2,13 +2,15 @@
 
 namespace Travelhood\OtpSimplePay;
 
+use Travelhood\OtpSimplePay\Enum\Currency;
 use Travelhood\OtpSimplePay\Exception\OrderException;
 
 /**
- * @property ProductCollectionInterface $products
+ * @property ProductCollectionInterface|ProductInterface[] $products
  */
-class Order extends Component implements HtmlizeInterface
+class Order extends Component
 {
+    /** @var array Include these fields in this order when creating the hash */
     const HASH_FIELDS = [
         'MERCHANT',
         'ORDER_REF',
@@ -25,16 +27,30 @@ class Order extends Component implements HtmlizeInterface
         'PAY_METHOD',
     ];
 
+
+    /**
+     * Set this PAY_METHOD for all subsequent orders as default
+     * @var string
+     */
+    public static $DefaultPayMethod = Enum\PayMethod::CARD;
+
+
+    /**
+     * Set this LANGUAGE for all subsequent orders as default
+     * @var string
+     */
+    public static $DefaultLanguage = Enum\Language::EN;
+
     /** @var ProductCollectionInterface|ProductInterface[] */
     private $_products;
 
     protected $_orderRef = '';
     protected $_orderDate = '';
-    protected $_pricesCurrency = 'EUR';
+    protected $_pricesCurrency = '';
     protected $_orderShipping = 0;
     protected $_discount = 0;
-    protected $_payMethod = Enum\PayMethod::CARD;
-    protected $_language = Enum\Language::EN;
+    protected $_payMethod = '';
+    protected $_language = '';
 
     protected $_billFirstName = '';
     protected $_billLastName = '';
@@ -55,6 +71,11 @@ class Order extends Component implements HtmlizeInterface
     protected $_deliveryState = '';
     protected $_deliveryCountryCode = '';
 
+    /**
+     * @param Service $service
+     * @param string $orderRef
+     * @param string $orderDate
+     */
     public function __construct(Service $service, $orderRef, $orderDate=null)
     {
         parent::__construct($service);
@@ -64,6 +85,9 @@ class Order extends Component implements HtmlizeInterface
             $orderDate = date('Y-m-d H:i:s');
         }
         $this->setOrderDate($orderDate);
+        $this->setPricesCurrency($this->service->config->getCurrency());
+        $this->setPayMethod(self::$DefaultPayMethod);
+        $this->setLanguage(self::$DefaultLanguage);
     }
 
     public function __get($name)
@@ -80,11 +104,31 @@ class Order extends Component implements HtmlizeInterface
      */
     public function validate()
     {
+        foreach(['orderRef','pricesCurrency','payMethod', 'language'] as $k) {
+            if(!$this->{'_'.$k}) {
+                throw new OrderException('Missing field: '.$k);
+            }
+        }
+        foreach(['FirstName', 'LastName', 'Phone', 'Email', 'Address', 'ZipCode', 'City', 'State', 'CountryCode'] as $k1) {
+            foreach(['bill', 'delivery'] as $k2) {
+                if($k1=='Email' && $k2=='delivery') {
+                    continue;
+                }
+                $k = $k2.$k1;
+                if(!$this->{'_'.$k}) {
+                    throw new OrderException('Missing field: '.$k);
+                }
+            }
+        }
         if($this->products->count() < 1) {
             throw new OrderException('No product specified');
         }
     }
 
+    /**
+     * @return array
+     * @throws OrderException
+     */
     public function toArray()
     {
         $this->validate();
@@ -155,6 +199,10 @@ class Order extends Component implements HtmlizeInterface
         return $array;
     }
 
+    /**
+     * @return string
+     * @throws OrderException
+     */
     public function __toString()
     {
         $s = $this->products.''.PHP_EOL;
@@ -165,18 +213,6 @@ class Order extends Component implements HtmlizeInterface
             $s.= $k.': '.$v.PHP_EOL;
         }
         return $s;
-    }
-
-    public function toHtml()
-    {
-        $html = $this->products->toHtml();
-        foreach($this->toArray() as $k=>$v) {
-            if(is_array($v)) {
-                continue;
-            }
-            $html.= '<strong>'.$k.'</strong>: '.$v.'<br/>'.PHP_EOL;
-        }
-        return $html;
     }
 
     /**
