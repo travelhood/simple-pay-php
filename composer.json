@@ -16,7 +16,7 @@
     }
   ],
   "require": {
-    "travelhood/logger": "^0.2"
+    "psr/log": "@stable"
   },
   "autoload": {
     "psr-4": {
