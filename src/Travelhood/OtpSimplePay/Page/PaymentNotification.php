@@ -4,7 +4,6 @@ namespace Travelhood\OtpSimplePay\Page;
 
 use Travelhood\OtpSimplePay\Exception\InstantPaymentNotificationException;
 use Travelhood\OtpSimplePay\Page;
-use Travelhood\OtpSimplePay\Util;
 
 class PaymentNotification extends Page
 {
@@ -35,8 +34,7 @@ class PaymentNotification extends Page
         $this->service->config->selectCurrency($data['CURRENCY']);
         $check = $data;
         unset($check['HASH']);
-        $check = Util::flattenArray($check);
-        $hash = Util::hmacArray($check, $this->service->config['merchant_secret']);
+        $hash = $this->service->hasher->hashArray($check);
         if($hash != $data['HASH']) {
             throw new InstantPaymentNotificationException('Invalid hash received');
         }
@@ -48,13 +46,13 @@ class PaymentNotification extends Page
             $this->_date = date('YmdHis');
         }
         $date = preg_replace('/[^\d]/', '', $this->_date);
-        $check = Util::flattenArray([
+        $check = [
             'IPN_PID' => [$this['IPN_PID'][0]],
             'IPN_PNAME' => [$this['IPN_PNAME'][0]],
             'IPN_DATE' => preg_replace('/[^\d]/','', $this['IPN_DATE']),
             'DATE' => $date,
-        ]);
-        $hash = Util::hmacArray($check, $this->service->config['merchant_secret']);
+        ];
+        $hash = $this->service->hasher->hashArray($check);
         return '<EPAYMENT>'.$date.'|'.$hash.'</EPAYMENT>';
     }
 

@@ -18,6 +18,6 @@ class InstantOrderStatusTest extends BaseTest
     {
         $status = $this->simplePay->instantOrderStatus($orderRef, $currency);
         $this->assertNotEquals('INVALID HASH', $status->getOrderStatus());
-        $this->assertRegExp('/^[\d]{4}-[\d]{2}-[\d]{2} [\d]{2}:[\d]{2}:[\d]{2}$/', $status->getOrderDate());
+        //$this->assertRegExp('/^[\d]{4}-[\d]{2}-[\d]{2} [\d]{2}:[\d]{2}:[\d]{2}$/', $status->getDate());
     }
 }

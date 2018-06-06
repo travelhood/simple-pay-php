@@ -2,6 +2,8 @@
 
 namespace Travelhood\OtpSimplePay;
 
+use Travelhood\OtpSimplePay\Exception\InstantDeliveryNotificationException;
+
 abstract class Instant extends Component
 {
     /** @var array */
@@ -48,7 +50,7 @@ abstract class Instant extends Component
         $key = $this->_getHashKey();
         $data = $this->_data;
         unset($data[$key]);
-        $hash = Util::hmacArray($data,$this->service->config['merchant_secret']);
+        $hash = $this->service->hasher->hashArray($data);
         if($hash != $this->_data[$key]) {
             throw new Exception('Failed to validate hash');
         }

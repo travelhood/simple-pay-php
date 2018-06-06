@@ -22,7 +22,7 @@ class RefundNotification extends Instant
             'IRN_DATE' => date('Y-m-d H:i:s'),
             'AMOUNT' => $orderAmount,
         ];
-        $hash = Util::hmacArray($query, $this->service->config['merchant_secret']);
+        $hash = $this->service->hasher->hashArray($query);
         $query['ORDER_HASH'] = $hash;
         $request = $this->service->createRequest($this->service->getUrlInstantRefundNotification(), $query);
         $this->_data = $request->fetch([$this, 'parse']);

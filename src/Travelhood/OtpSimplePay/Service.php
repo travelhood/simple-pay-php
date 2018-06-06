@@ -4,6 +4,7 @@ namespace Travelhood\OtpSimplePay;
 
 /**
  * @property Config $config
+ * @property Hasher $hasher
  */
 class Service extends Component
 {
@@ -18,6 +19,9 @@ class Service extends Component
     /** @var Config */
     protected $_config;
 
+    /** @var Hasher */
+    protected $_hasher;
+
     protected function _getUrlBase()
     {
         if($this->config['live']) {
@@ -30,6 +34,7 @@ class Service extends Component
     {
         parent::__construct($this);
         $this->_config = $config;
+        $this->_hasher = new Hasher($this);
     }
 
     /**
@@ -41,6 +46,8 @@ class Service extends Component
         switch ($name) {
             case 'config':
                 return $this->_config;
+            case 'hasher':
+                return $this->_hasher;
         }
         return parent::__get($name);
     }

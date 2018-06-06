@@ -22,7 +22,7 @@ class DeliveryNotification extends Instant
             'ORDER_CURRENCY' => $this->service->config->getCurrency(),
             'DATE_IDN' => date('Y-m-d H:i:s'),
         ];
-        $hash = Util::hmacArray($query, $this->service->config['merchant_secret']);
+        $hash = $this->service->hasher->hashArray($query);
         $query['ORDER_HASH'] = $hash;
         $request = $this->service->createRequest($this->service->getUrlInstantDeliveryNotification(), $query);
         $this->_data = $request->fetch([$this, 'parse']);

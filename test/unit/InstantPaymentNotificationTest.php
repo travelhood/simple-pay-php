@@ -10,7 +10,7 @@ class InstantPaymentNotificationTest extends BaseTest
 
     public function testInstantPaymentNotification()
     {
-        $page = $this->simplePay->pageInstantPaymentNotification();
+        $page = $this->simplePay->pagePaymentNotification();
         $page->setDate('2018-06-04 11:07:44');
         $this->assertArrayHasKey('HASH', $page);
         $response = $page->getMessage();

@@ -19,8 +19,7 @@ class OrderStatus extends Instant
             'MERCHANT' => $this->service->config['merchant_id'],
             'REFNOEXT' => $orderRef,
         ];
-        $secret = $this->service->config['merchant_secret'];
-        $hash = Util::hmacArray($data, $secret);
+        $hash = $this->service->hasher->hashArray($data);
         $data['HASH'] = $hash;
         $request = $this->service->createRequest($this->service->getUrlInstantOrderStatus(), $data);
         $request->setMethod('POST');
@@ -44,6 +43,11 @@ class OrderStatus extends Instant
     public function getPayMethod()
     {
         return $this->_getDataKey('PAYMETHOD');
+    }
+
+    public function getDate()
+    {
+        return $this->_getDataKey('');
     }
 
 }
