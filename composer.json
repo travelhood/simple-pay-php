@@ -1,5 +1,5 @@
 {
-  "name": "travelhood/otp-simple-pay",
+  "name": "travelhood/simple-pay-php",
   "description": "OTP Simple Pay API library",
   "minimum-stability": "dev",
   "license": "proprietary",
