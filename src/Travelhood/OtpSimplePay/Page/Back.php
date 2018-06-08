@@ -36,7 +36,7 @@ class Back extends Page
         }
         if($this->offsetExists(self::KEY_CONTROL_HASH)) {
             $port = $_SERVER['SERVER_PORT'];
-            if($port == 80) {
+            if($port == 80 || $port == 443) {
                 $port = '';
             }
             else {
