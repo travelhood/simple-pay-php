@@ -28,11 +28,12 @@ class Hasher extends Component
 
     /**
      * @param string $string
+     * @param bool $prefixLength
      * @return string
      */
-    public function hashString($string)
+    public function hashString($string, $prefixLength=false)
     {
-        return hash_hmac('md5', $string, $this->service->config['merchant_secret']);
+        return hash_hmac('md5', ($prefixLength?strlen($string):'').$string, $this->service->config['merchant_secret']);
     }
 
     /**
