@@ -44,6 +44,9 @@ class Order extends Component
     /** @var ProductCollectionInterface|ProductInterface[] */
     private $_products;
 
+    protected $_urlBack = '';
+    protected $_urlTimeout = '';
+
     protected $_orderRef = '';
     protected $_orderDate = '';
     protected $_pricesCurrency = '';
@@ -163,8 +166,8 @@ class Order extends Component
             'PAY_METHOD' => $this->getPayMethod(),
             'LANGUAGE' => $this->getLanguage(),
             'ORDER_TIMEOUT' => $this->service->config['timeout'],
-            'TIMEOUT_URL' => $this->service->config['url']['timeout'].$query,
-            'BACK_REF' => $this->service->config['url']['back'].$query,
+            'TIMEOUT_URL' => $this->getUrlTimeout().$query,
+            'BACK_REF' => $this->getUrlBack().$query,
             'BILL_FNAME' => $this->getBillFirstName(),
             'BILL_LNAME' => $this->getBillLastName(),
             'BILL_EMAIL' => $this->getBillEmail(),
@@ -214,6 +217,48 @@ class Order extends Component
             $s.= $k.': '.$v.PHP_EOL;
         }
         return $s;
+    }
+
+    /**
+     * @return string
+     */
+    public function getUrlBack()
+    {
+        if(!$this->_urlBack) {
+            return $this->service->config['url']['back'];
+        }
+        return $this->_urlBack;
+    }
+
+    /**
+     * @param string $value
+     * @return $this
+     */
+    public function setUrlBack($value)
+    {
+        $this->_urlBack = $value;
+        return $this;
+    }
+
+    /**
+     * @return string
+     */
+    public function getUrlTimeout()
+    {
+        if(!$this->_urlTimeout) {
+            return $this->service->config['url']['timeout'];
+        }
+        return $this->_urlTimeout;
+    }
+
+    /**
+     * @param string $value
+     * @return $this
+     */
+    public function setUrlTimeout($value)
+    {
+        $this->_urlTimeout = $value;
+        return $this;
     }
 
     /**
