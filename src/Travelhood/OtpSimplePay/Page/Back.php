@@ -42,7 +42,14 @@ class Back extends Page
             else {
                 $port = ':'.$port;
             }
-            $fullUrl = 'http'.((array_key_exists('HTTPS', $_SERVER) && $_SERVER['HTTPS']) ? 's' : '').'://'.$_SERVER['HTTP_HOST'].$port.$_SERVER['REQUEST_URI'];
+            $protocol = 'http';
+            if(array_key_exists('HTTP_X_FORWARDED_PROTO', $_SERVER)) {
+                $protocol = $_SERVER['HTTP_X_FORWARDED_PROTO'];
+            }
+            elseif(array_key_exists('HTTPS', $_SERVER) && $_SERVER['HTTPS']) {
+                $protocol = 'https';
+            }
+            $fullUrl = $protocol.'://'.$_SERVER['HTTP_HOST'].$port.$_SERVER['REQUEST_URI'];
             $checkUrl = preg_replace("/\&".self::KEY_CONTROL_HASH."\=.+$/", '', $fullUrl);
             $this->service->config->selectCurrency($this[self::KEY_ORDER_CURRENCY]);
             $hash = $this->service->hasher->hashString($checkUrl, true);
