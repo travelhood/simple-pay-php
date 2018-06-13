@@ -45,7 +45,7 @@ class Back extends Page
             $fullUrl = 'http'.((array_key_exists('HTTPS', $_SERVER) && $_SERVER['HTTPS']) ? 's' : '').'://'.$_SERVER['HTTP_HOST'].$port.$_SERVER['REQUEST_URI'];
             $fullUrl = preg_replace("/\&ctrl\=[a-zA-Z0-9]+$/", '', $fullUrl);
             $this->service->config->selectCurrency($this[self::KEY_ORDER_CURRENCY]);
-            $hash = $this->service->hasher->hashString($fullUrl);
+            $hash = $this->service->hasher->hashString($fullUrl, true);
             if($hash != $this[self::KEY_CONTROL_HASH]) {
                 throw new ControlMismatchException('Control variable mismatch!');
             }
