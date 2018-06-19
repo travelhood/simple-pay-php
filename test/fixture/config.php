@@ -15,7 +15,7 @@ return [
     'live' => false,
     'timeout' => 60,
     'log' => [
-        'level' => 'DEBUG',
+        'level' => 'debug',
         'path' => __DIR__ . '/../log/simplepay.log',
     ],
     'url' => [
