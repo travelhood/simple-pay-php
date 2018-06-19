@@ -2,7 +2,6 @@
 
 namespace Travelhood\OtpSimplePay;
 
-use Travelhood\OtpSimplePay\Enum\Currency;
 use Travelhood\OtpSimplePay\Exception\OrderException;
 
 /**
@@ -40,13 +39,8 @@ class Order extends Component
      * @var string
      */
     public static $DefaultLanguage = Enum\Language::EN;
-
-    /** @var ProductCollectionInterface|ProductInterface[] */
-    private $_products;
-
     protected $_urlBack = '';
     protected $_urlTimeout = '';
-
     protected $_orderRef = '';
     protected $_orderDate = '';
     protected $_pricesCurrency = '';
@@ -54,7 +48,6 @@ class Order extends Component
     protected $_discount = 0;
     protected $_payMethod = '';
     protected $_language = '';
-
     protected $_billFirstName = '';
     protected $_billLastName = '';
     protected $_billEmail = '';
@@ -64,7 +57,6 @@ class Order extends Component
     protected $_billCity = '';
     protected $_billState = '';
     protected $_billCountryCode = '';
-
     protected $_deliveryFirstName = '';
     protected $_deliveryLastName = '';
     protected $_deliveryPhone = '';
@@ -73,18 +65,20 @@ class Order extends Component
     protected $_deliveryCity = '';
     protected $_deliveryState = '';
     protected $_deliveryCountryCode = '';
+    /** @var ProductCollectionInterface|ProductInterface[] */
+    private $_products;
 
     /**
      * @param Service $service
      * @param string $orderRef
      * @param string $orderDate
      */
-    public function __construct(Service $service, $orderRef, $orderDate=null)
+    public function __construct(Service $service, $orderRef, $orderDate = null)
     {
         parent::__construct($service);
         $this->_products = new ProductCollection;
         $this->setOrderRef($orderRef);
-        if(!$orderDate) {
+        if (!$orderDate) {
             $orderDate = date('Y-m-d H:i:s');
         }
         $this->setOrderDate($orderDate);
@@ -95,7 +89,7 @@ class Order extends Component
 
     public function __get($name)
     {
-        switch($name) {
+        switch ($name) {
             case 'products':
                 return $this->_products;
         }
@@ -103,29 +97,19 @@ class Order extends Component
     }
 
     /**
+     * @return string
      * @throws OrderException
      */
-    public function validate()
+    public function __toString()
     {
-        foreach(['orderRef','pricesCurrency','payMethod', 'language'] as $k) {
-            if(!$this->{'_'.$k}) {
-                throw new OrderException('Missing field: '.$k);
+        $s = $this->products . '' . PHP_EOL;
+        foreach ($this->toArray() as $k => $v) {
+            if (is_array($v)) {
+                continue;
             }
+            $s .= $k . ': ' . $v . PHP_EOL;
         }
-        foreach(['FirstName', 'LastName', 'Phone', 'Email', 'Address', 'ZipCode', 'City', 'State', 'CountryCode'] as $k1) {
-            foreach(['bill', 'delivery'] as $k2) {
-                if($k1=='Email' && $k2=='delivery') {
-                    continue;
-                }
-                $k = $k2.$k1;
-                if(!$this->{'_'.$k}) {
-                    throw new OrderException('Missing field: '.$k);
-                }
-            }
-        }
-        if($this->products->count() < 1) {
-            throw new OrderException('No product specified');
-        }
+        return $s;
     }
 
     /**
@@ -141,7 +125,7 @@ class Order extends Component
         $pprice = [];
         $pqty = [];
         $pvat = [];
-        foreach($this->products as $product) {
+        foreach ($this->products as $product) {
             $pname[] = $product->getName();
             $pcode[] = $product->getCode();
             $pinfo[] = $product->getInfo();
@@ -149,7 +133,7 @@ class Order extends Component
             $pqty[] = $this->products->countProduct($product);
             $pvat[] = $product->getVat();
         }
-        $query = '?order_ref='.urlencode($this->getOrderRef()).'&order_currency='.urlencode($this->service->config->getCurrency());
+        $query = '?order_ref=' . urlencode($this->getOrderRef()) . '&order_currency=' . urlencode($this->service->config->getCurrency());
         $array = [
             'MERCHANT' => $this->service->config['merchant_id'],
             'ORDER_REF' => $this->getOrderRef(),
@@ -166,8 +150,8 @@ class Order extends Component
             'PAY_METHOD' => $this->getPayMethod(),
             'LANGUAGE' => $this->getLanguage(),
             'ORDER_TIMEOUT' => $this->service->config['timeout'],
-            'TIMEOUT_URL' => $this->getUrlTimeout().$query,
-            'BACK_REF' => $this->getUrlBack().$query,
+            'TIMEOUT_URL' => $this->getUrlTimeout() . $query,
+            'BACK_REF' => $this->getUrlBack() . $query,
             'BILL_FNAME' => $this->getBillFirstName(),
             'BILL_LNAME' => $this->getBillLastName(),
             'BILL_EMAIL' => $this->getBillEmail(),
@@ -188,15 +172,14 @@ class Order extends Component
             'SDK_VERSION' => Service::VERSION,
         ];
         $serial = '';
-        foreach(self::HASH_FIELDS as $field) {
-            if(is_array($array[$field])) {
-                foreach($array[$field] as $v) {
-                    $serial.= strlen($v).$v;
+        foreach (self::HASH_FIELDS as $field) {
+            if (is_array($array[$field])) {
+                foreach ($array[$field] as $v) {
+                    $serial .= strlen($v) . $v;
                 }
-            }
-            else {
+            } else {
                 $v = $array[$field];
-                $serial.= strlen($v).$v;
+                $serial .= strlen($v) . $v;
             }
         }
         $hash = $this->service->hasher->hashString($serial);
@@ -205,163 +188,30 @@ class Order extends Component
     }
 
     /**
-     * @return string
      * @throws OrderException
      */
-    public function __toString()
+    public function validate()
     {
-        $s = $this->products.''.PHP_EOL;
-        foreach($this->toArray() as $k=>$v) {
-            if(is_array($v)) {
-                continue;
+        foreach (['orderRef', 'pricesCurrency', 'payMethod', 'language'] as $k) {
+            if (!$this->{'_' . $k}) {
+                throw new OrderException('Missing field: ' . $k);
             }
-            $s.= $k.': '.$v.PHP_EOL;
         }
-        return $s;
-    }
-
-    /**
-     * @return string
-     */
-    public function getUrlBack()
-    {
-        if(!$this->_urlBack) {
-            return $this->service->config['url']['back'];
+        foreach (['FirstName', 'LastName', 'Phone', 'Email', 'Address', 'ZipCode', 'City', 'State', 'CountryCode'] as $k1) {
+            foreach (['bill', 'delivery'] as $k2) {
+                if ($k1 == 'Email' && $k2 == 'delivery') {
+                    continue;
+                }
+                $k = $k2 . $k1;
+                if (!$this->{'_' . $k}) {
+                    throw new OrderException('Missing field: ' . $k);
+                }
+            }
         }
-        return $this->_urlBack;
-    }
-
-    /**
-     * @param string $value
-     * @return $this
-     */
-    public function setUrlBack($value)
-    {
-        $this->_urlBack = $value;
-        return $this;
-    }
-
-    /**
-     * @return string
-     */
-    public function getUrlTimeout()
-    {
-        if(!$this->_urlTimeout) {
-            return $this->service->config['url']['timeout'];
+        if ($this->products->count() < 1) {
+            throw new OrderException('No product specified');
         }
-        return $this->_urlTimeout;
     }
-
-    /**
-     * @param string $value
-     * @return $this
-     */
-    public function setUrlTimeout($value)
-    {
-        $this->_urlTimeout = $value;
-        return $this;
-    }
-
-    /**
-     * Sets both billing and delivery first name
-     * @param string $value
-     * @return $this
-     */
-    public function setFirstName($value)
-    {
-        $this->_billFirstName = $this->_deliveryFirstName = $value;
-        return $this;
-    }
-
-    /**
-     * Sets both billing and delivery last name
-     * @param string $value
-     * @return $this
-     */
-    public function setLastName($value)
-    {
-        $this->_billLastName = $this->_deliveryLastName = $value;
-        return $this;
-    }
-
-    /**
-     * Sets billing email
-     * @param string $value
-     * @return $this
-     */
-    public function setEmail($value)
-    {
-        $this->_billEmail = $value;
-        return $this;
-    }
-
-    /**
-     * Sets both billing and delivery phone
-     * @param string $value
-     * @return $this
-     */
-    public function setPhone($value)
-    {
-        $this->_billPhone = $this->_deliveryPhone = $value;
-        return $this;
-    }
-
-    /**
-     * Sets both billing and delivery address
-     * @param string $value
-     * @return $this
-     */
-    public function setAddress($value)
-    {
-        $this->_billAddress = $this->_deliveryAddress = $value;
-        return $this;
-    }
-
-    /**
-     * Sets both billing and delivery zip code
-     * @param string $value
-     * @return $this
-     */
-    public function setZipCode($value)
-    {
-        $this->_billZipCode = $this->_deliveryZipCode = $value;
-        return $this;
-    }
-
-    /**
-     * Sets both billing and delivery city
-     * @param string $value
-     * @return $this
-     */
-    public function setCity($value)
-    {
-        $this->_billCity = $this->_deliveryCity = $value;
-        return $this;
-    }
-
-    /**
-     * Sets both billing and delivery state
-     * @param string $value
-     * @return $this
-     */
-    public function setState($value)
-    {
-        $this->_billState = $this->_deliveryState = $value;
-        return $this;
-    }
-
-    /**
-     * Sets both billing and delivery country code
-     * @param string $value
-     * @return $this
-     */
-    public function setCountryCode($value)
-    {
-        $this->_billCountryCode = $this->_deliveryCountryCode = $value;
-        return $this;
-    }
-
-    #region getters/setters
 
     /**
      * @return string
@@ -479,6 +329,8 @@ class Order extends Component
         return $this->_language;
     }
 
+    #region getters/setters
+
     /**
      * @param string $language
      * @return $this
@@ -486,6 +338,48 @@ class Order extends Component
     public function setLanguage($language)
     {
         $this->_language = $language;
+        return $this;
+    }
+
+    /**
+     * @return string
+     */
+    public function getUrlTimeout()
+    {
+        if (!$this->_urlTimeout) {
+            return $this->service->config['url']['timeout'];
+        }
+        return $this->_urlTimeout;
+    }
+
+    /**
+     * @param string $value
+     * @return $this
+     */
+    public function setUrlTimeout($value)
+    {
+        $this->_urlTimeout = $value;
+        return $this;
+    }
+
+    /**
+     * @return string
+     */
+    public function getUrlBack()
+    {
+        if (!$this->_urlBack) {
+            return $this->service->config['url']['back'];
+        }
+        return $this->_urlBack;
+    }
+
+    /**
+     * @param string $value
+     * @return $this
+     */
+    public function setUrlBack($value)
+    {
+        $this->_urlBack = $value;
         return $this;
     }
 
@@ -792,6 +686,105 @@ class Order extends Component
     public function setDeliveryCountryCode($deliveryCountryCode)
     {
         $this->_deliveryCountryCode = $deliveryCountryCode;
+        return $this;
+    }
+
+    /**
+     * Sets both billing and delivery first name
+     * @param string $value
+     * @return $this
+     */
+    public function setFirstName($value)
+    {
+        $this->_billFirstName = $this->_deliveryFirstName = $value;
+        return $this;
+    }
+
+    /**
+     * Sets both billing and delivery last name
+     * @param string $value
+     * @return $this
+     */
+    public function setLastName($value)
+    {
+        $this->_billLastName = $this->_deliveryLastName = $value;
+        return $this;
+    }
+
+    /**
+     * Sets billing email
+     * @param string $value
+     * @return $this
+     */
+    public function setEmail($value)
+    {
+        $this->_billEmail = $value;
+        return $this;
+    }
+
+    /**
+     * Sets both billing and delivery phone
+     * @param string $value
+     * @return $this
+     */
+    public function setPhone($value)
+    {
+        $this->_billPhone = $this->_deliveryPhone = $value;
+        return $this;
+    }
+
+    /**
+     * Sets both billing and delivery address
+     * @param string $value
+     * @return $this
+     */
+    public function setAddress($value)
+    {
+        $this->_billAddress = $this->_deliveryAddress = $value;
+        return $this;
+    }
+
+    /**
+     * Sets both billing and delivery zip code
+     * @param string $value
+     * @return $this
+     */
+    public function setZipCode($value)
+    {
+        $this->_billZipCode = $this->_deliveryZipCode = $value;
+        return $this;
+    }
+
+    /**
+     * Sets both billing and delivery city
+     * @param string $value
+     * @return $this
+     */
+    public function setCity($value)
+    {
+        $this->_billCity = $this->_deliveryCity = $value;
+        return $this;
+    }
+
+    /**
+     * Sets both billing and delivery state
+     * @param string $value
+     * @return $this
+     */
+    public function setState($value)
+    {
+        $this->_billState = $this->_deliveryState = $value;
+        return $this;
+    }
+
+    /**
+     * Sets both billing and delivery country code
+     * @param string $value
+     * @return $this
+     */
+    public function setCountryCode($value)
+    {
+        $this->_billCountryCode = $this->_deliveryCountryCode = $value;
         return $this;
     }
 

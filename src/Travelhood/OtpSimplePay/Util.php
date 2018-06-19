@@ -49,8 +49,8 @@ abstract class Util
      */
     public static function interpolateString($template, array $dictionary)
     {
-        foreach($dictionary as $k=>$v) {
-            $template = str_replace('%{'.$k.'}', $v, $template);
+        foreach ($dictionary as $k => $v) {
+            $template = str_replace('%{' . $k . '}', $v, $template);
         }
         return $template;
     }

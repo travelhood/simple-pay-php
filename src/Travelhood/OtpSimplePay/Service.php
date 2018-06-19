@@ -28,23 +28,14 @@ class Service extends Component implements LoggerAwareInterface
     /** @var Hasher */
     protected $_hasher;
 
-    protected function _getUrlBase()
-    {
-        if($this->config['live']) {
-            return self::URL_LIVE;
-        }
-        return self::URL_SANDBOX;
-    }
-
     public function __construct(Config $config)
     {
         parent::__construct($this);
         $this->_config = $config;
         $this->_hasher = new Hasher($this);
-        if(is_array($config['log'])) {
+        if (is_array($config['log'])) {
             $this->_logger = new FileLogger($config['log']['path'], $config['log']['level']);
-        }
-        else {
+        } else {
             $this->_logger = new NullLogger;
         }
     }
@@ -71,37 +62,45 @@ class Service extends Component implements LoggerAwareInterface
 
     public function getUrlLiveUpdate()
     {
-        return $this->_getUrlBase().self::URL_LIVE_UPDATE;
+        return $this->_getUrlBase() . self::URL_LIVE_UPDATE;
+    }
+
+    protected function _getUrlBase()
+    {
+        if ($this->config['live']) {
+            return self::URL_LIVE;
+        }
+        return self::URL_SANDBOX;
     }
 
     public function getUrlInstantDeliveryNotification()
     {
-        return $this->_getUrlBase().self::URL_INSTANT_DELIVERY_NOTIFICATION;
+        return $this->_getUrlBase() . self::URL_INSTANT_DELIVERY_NOTIFICATION;
     }
 
     public function getUrlInstantRefundNotification()
     {
-        return $this->_getUrlBase().self::URL_INSTANT_REFUND_NOTIFICATION;
+        return $this->_getUrlBase() . self::URL_INSTANT_REFUND_NOTIFICATION;
     }
 
     public function getUrlInstantOrderStatus()
     {
-        return $this->_getUrlBase().self::URL_INSTANT_ORDER_STATUS;
+        return $this->_getUrlBase() . self::URL_INSTANT_ORDER_STATUS;
     }
 
     public function getUrlTokens()
     {
-        return $this->_getUrlBase().self::URL_TOKENS;
+        return $this->_getUrlBase() . self::URL_TOKENS;
     }
 
-    public function createOrder($orderRef, $orderDate=null)
+    public function createOrder($orderRef, $orderDate = null)
     {
         return new Order($this, $orderRef, $orderDate);
     }
 
-    public function createRequest($url, $query=[])
+    public function createRequest($url, $query = [])
     {
-        if($this->config['curl']) {
+        if ($this->config['curl']) {
             return new Request\Curl($url, $query);
         }
         return new Request\FileGetContents($url, $query);
@@ -127,17 +126,17 @@ class Service extends Component implements LoggerAwareInterface
         return new Page\PaymentNotification($this);
     }
 
-    public function instantOrderStatus($orderRef, $currency=null)
+    public function instantOrderStatus($orderRef, $currency = null)
     {
         return new Instant\OrderStatus($this, $orderRef, $currency);
     }
 
-    public function instantDeliveryNotification($simplePayRef, $amount, $currency=null)
+    public function instantDeliveryNotification($simplePayRef, $amount, $currency = null)
     {
         return new Instant\DeliveryNotification($this, $simplePayRef, $amount, $currency);
     }
 
-    public function instantRefundNotification($simplePayRef, $orderAmount, $refundAmount, $currency=null)
+    public function instantRefundNotification($simplePayRef, $orderAmount, $refundAmount, $currency = null)
     {
         return new Instant\RefundNotification($this, $simplePayRef, $orderAmount, $refundAmount, $currency);
     }

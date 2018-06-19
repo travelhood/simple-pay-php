@@ -13,7 +13,7 @@ interface RequestInterface
 
     public function setQuery(array $query);
 
-    public function parse($raw, $parser=null);
+    public function parse($raw, $parser = null);
 
-    public function fetch($parser=null);
+    public function fetch($parser = null);
 }

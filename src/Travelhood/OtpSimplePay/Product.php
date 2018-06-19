@@ -31,18 +31,41 @@ class Product implements ProductInterface
      * @param float $price
      * @param float $vat
      */
-    public function __construct($name='', $code='', $info='', $price=.0, $vat = .0)
+    public function __construct($name = '', $code = '', $info = '', $price = .0, $vat = .0)
     {
-        if(is_array($name)) {
+        if (is_array($name)) {
             $this->fromArray($name);
-        }
-        else {
+        } else {
             $this->_name = $name;
             $this->_code = $code;
             $this->_info = $info;
             $this->_price = $price;
             $this->_vat = $vat;
         }
+    }
+
+    /**
+     * @param array $array
+     * @return $this
+     */
+    public function fromArray(array $array)
+    {
+        foreach (self::VALID_FIELDS as $f) {
+            $this->{'_' . $f} = $array[$f];
+        }
+        return $this;
+    }
+
+    /**
+     * @param string $offset
+     * @return mixed
+     */
+    public function offsetGet($offset)
+    {
+        if (!$this->offsetExists($offset)) {
+            return null;
+        }
+        return $this->{'_' . $offset};
     }
 
     /**
@@ -56,25 +79,13 @@ class Product implements ProductInterface
 
     /**
      * @param string $offset
-     * @return mixed
-     */
-    public function offsetGet($offset)
-    {
-        if(!$this->offsetExists($offset)) {
-            return null;
-        }
-        return $this->{'_'.$offset};
-    }
-
-    /**
-     * @param string $offset
      * @param mixed $value
      * @throws ProductException
      */
     public function offsetSet($offset, $value)
     {
-        if(!$this->offsetExists($offset)) {
-            throw new ProductException('Invalid field for Product: '.$offset);
+        if (!$this->offsetExists($offset)) {
+            throw new ProductException('Invalid field for Product: ' . $offset);
         }
     }
 
@@ -83,46 +94,10 @@ class Product implements ProductInterface
      */
     public function offsetUnset($offset)
     {
-        if(!$this->offsetExists($offset)) {
+        if (!$this->offsetExists($offset)) {
             return;
         }
-        $this->{'_'.$offset} = null;
-    }
-
-    /**
-     * @return string
-     */
-    public function getName()
-    {
-        return $this->_name;
-    }
-
-    /**
-     * @param string $name
-     * @return Product
-     */
-    public function setName($name)
-    {
-        $this->_name = $name;
-        return $this;
-    }
-
-    /**
-     * @return string
-     */
-    public function getCode()
-    {
-        return $this->_code;
-    }
-
-    /**
-     * @param string $code
-     * @return Product
-     */
-    public function setCode($code)
-    {
-        $this->_code = $code;
-        return $this;
+        $this->{'_' . $offset} = null;
     }
 
     /**
@@ -180,18 +155,6 @@ class Product implements ProductInterface
     }
 
     /**
-     * @param array $array
-     * @return $this
-     */
-    public function fromArray(array $array)
-    {
-        foreach(self::VALID_FIELDS as $f) {
-            $this->{'_'.$f} = $array[$f];
-        }
-        return $this;
-    }
-
-    /**
      * @return array
      */
     public function toArray()
@@ -208,6 +171,42 @@ class Product implements ProductInterface
     public function __toString()
     {
         return $this->getName() . ' - ' . $this->getCode();
+    }
+
+    /**
+     * @return string
+     */
+    public function getName()
+    {
+        return $this->_name;
+    }
+
+    /**
+     * @param string $name
+     * @return Product
+     */
+    public function setName($name)
+    {
+        $this->_name = $name;
+        return $this;
+    }
+
+    /**
+     * @return string
+     */
+    public function getCode()
+    {
+        return $this->_code;
+    }
+
+    /**
+     * @param string $code
+     * @return Product
+     */
+    public function setCode($code)
+    {
+        $this->_code = $code;
+        return $this;
     }
 
 }

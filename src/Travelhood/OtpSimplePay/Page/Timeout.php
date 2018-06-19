@@ -3,7 +3,6 @@
 namespace Travelhood\OtpSimplePay\Page;
 
 use Travelhood\OtpSimplePay\Page;
-use Travelhood\OtpSimplePay\Service;
 
 class Timeout extends Page
 {
@@ -12,9 +11,12 @@ class Timeout extends Page
         return $_GET;
     }
 
-    public function isTimeout()
+    public function __toString()
     {
-        return $this['redirect'] != 1;
+        if ($this->isUserAction()) {
+            return 'User has canceled the transaction';
+        }
+        return 'The transaction has timed out';
     }
 
     public function isUserAction()
@@ -22,12 +24,9 @@ class Timeout extends Page
         return !$this->isTimeout();
     }
 
-    public function __toString()
+    public function isTimeout()
     {
-        if($this->isUserAction()) {
-            return 'User has canceled the transaction';
-        }
-        return 'The transaction has timed out';
+        return $this['redirect'] != 1;
     }
 
 }

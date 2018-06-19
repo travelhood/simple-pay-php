@@ -9,17 +9,23 @@ abstract class Instant extends Component
     /** @var array */
     protected $_data;
 
-    protected function _getDataKey($key)
+    public function getData()
     {
-        if(array_key_exists($key, $this->_data)) {
-            return $this->_data[$key];
-        }
-        return null;
+        return $this->_data;
     }
 
-    protected function _getHashKey()
+    public function parse($raw)
     {
-        return 'HASH';
+        $dom = new \DOMDocument();
+        $dom->loadHTML($raw);
+        $epayment = $dom->getElementsByTagName('epayment');
+        if (count($epayment) < 1) {
+            $body = $dom->getElementsByTagName('body');
+            throw new Exception($body[0]->textContent);
+        }
+        //$raw2 = substr($raw, 10, -11); // strip <epayment> tag
+        $split = explode('|', $epayment[0]->textContent);
+        return array_combine($this->_getKeyMap(), $split);
     }
 
     protected function _getKeyMap()
@@ -33,42 +39,23 @@ abstract class Instant extends Component
         ];
     }
 
-    public function getData()
-    {
-        return $this->_data;
-    }
-
-    public function parse($raw)
-    {
-        $dom = new \DOMDocument();
-        $dom->loadHTML($raw);
-        $epayment = $dom->getElementsByTagName('epayment');
-        if(count($epayment) < 1) {
-            $body = $dom->getElementsByTagName('body');
-            throw new Exception($body[0]->textContent);
-        }
-        //$raw2 = substr($raw, 10, -11); // strip <epayment> tag
-        $split = explode('|', $epayment[0]->textContent);
-        return array_combine($this->_getKeyMap(), $split);
-    }
-
     function validate()
     {
         $key = $this->_getHashKey();
         $data = $this->_data;
         unset($data[$key]);
         $hash = $this->service->hasher->hashArray($data);
-        if($hash != $this->_data[$key]) {
+        if ($hash != $this->_data[$key]) {
             throw new Exception('Failed to validate hash');
         }
-        if($this->getResponseCode() !== null && $this->getResponseCode() !== 1) {
+        if ($this->getResponseCode() !== null && $this->getResponseCode() !== 1) {
             throw new InstantDeliveryNotificationException($this->getResponseText(), $this->getResponseCode());
         }
     }
 
-    public function getSimplePayRef()
+    protected function _getHashKey()
     {
-        return $this->_getDataKey('REFNO');
+        return 'HASH';
     }
 
     public function getResponseCode()
@@ -76,9 +63,22 @@ abstract class Instant extends Component
         return $this->_getDataKey('RC');
     }
 
+    protected function _getDataKey($key)
+    {
+        if (array_key_exists($key, $this->_data)) {
+            return $this->_data[$key];
+        }
+        return null;
+    }
+
     public function getResponseText()
     {
         return $this->_getDataKey('RT');
+    }
+
+    public function getSimplePayRef()
+    {
+        return $this->_getDataKey('REFNO');
     }
 
     public function getDate()

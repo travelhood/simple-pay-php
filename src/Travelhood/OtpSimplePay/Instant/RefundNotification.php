@@ -2,16 +2,15 @@
 
 namespace Travelhood\OtpSimplePay\Instant;
 
-use Travelhood\OtpSimplePay\Service;
 use Travelhood\OtpSimplePay\Instant;
-use Travelhood\OtpSimplePay\Util;
+use Travelhood\OtpSimplePay\Service;
 
 class RefundNotification extends Instant
 {
-    public function __construct(Service $service, $simplePayRef, $orderAmount, $refundAmount, $currency=null)
+    public function __construct(Service $service, $simplePayRef, $orderAmount, $refundAmount, $currency = null)
     {
         parent::__construct($service);
-        if($currency) {
+        if ($currency) {
             $this->service->config->selectCurrency($currency);
         }
         $query = [

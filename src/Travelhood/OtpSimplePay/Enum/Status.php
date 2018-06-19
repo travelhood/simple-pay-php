@@ -34,5 +34,7 @@ final class Status
     /**
      * Instance not allowed
      */
-    private function __construct() { }
+    private function __construct()
+    {
+    }
 }

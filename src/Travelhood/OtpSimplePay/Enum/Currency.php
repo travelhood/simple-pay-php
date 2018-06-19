@@ -11,5 +11,7 @@ final class Currency
     /**
      * Instance not allowed
      */
-    private function __construct() { }
+    private function __construct()
+    {
+    }
 }

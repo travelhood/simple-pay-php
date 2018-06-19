@@ -6,12 +6,12 @@ use Travelhood\OtpSimplePay\Request;
 
 class FileGetContents extends Request
 {
-    public function fetch($parser=null)
+    public function fetch($parser = null)
     {
         $options = array(
             'http' => array(
                 'method' => $this->_method,
-                'header' => "Accept-language: en\r\n". "Content-type: application/x-www-form-urlencoded\r\n",
+                'header' => "Accept-language: en\r\n" . "Content-type: application/x-www-form-urlencoded\r\n",
                 'content' => http_build_query($this->_query, '', '&'),
             ),
         );

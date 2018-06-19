@@ -20,7 +20,7 @@ abstract class Request implements RequestInterface
      * @param string $url
      * @param array $query
      */
-    public function __construct($url, $query=[])
+    public function __construct($url, $query = [])
     {
         $this->setUrl($url);
         $this->setQuery($query);
@@ -37,6 +37,16 @@ abstract class Request implements RequestInterface
     }
 
     /**
+     * @param array $query
+     * @return $this
+     */
+    public function setQuery(array $query)
+    {
+        $this->_query = $query;
+        return $this;
+    }
+
+    /**
      * @param string $method
      * @return $this
      * @throws RequestException
@@ -49,18 +59,8 @@ abstract class Request implements RequestInterface
                 $this->_method = $method;
                 break;
             default:
-                throw new RequestException('Invalid method: '.$method);
+                throw new RequestException('Invalid method: ' . $method);
         }
-        return $this;
-    }
-
-    /**
-     * @param array $query
-     * @return $this
-     */
-    public function setQuery(array $query)
-    {
-        $this->_query = $query;
         return $this;
     }
 
@@ -69,17 +69,17 @@ abstract class Request implements RequestInterface
      * @param callable $parser
      * @return array
      */
-    public function parse($raw, $parser=null)
+    public function parse($raw, $parser = null)
     {
-        if($parser) {
+        if ($parser) {
             return $parser($raw);
         }
-        return (array) simplexml_load_string($raw);
+        return (array)simplexml_load_string($raw);
     }
 
     /**
      * @param callable $parser
      * @return mixed
      */
-    abstract public function fetch($parser=null);
+    abstract public function fetch($parser = null);
 }

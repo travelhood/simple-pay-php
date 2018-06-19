@@ -2,17 +2,16 @@
 
 namespace Travelhood\OtpSimplePay\Instant;
 
-use Travelhood\OtpSimplePay\Service;
-use Travelhood\OtpSimplePay\Instant;
-use Travelhood\OtpSimplePay\Util;
 use Travelhood\OtpSimplePay\Exception\InstantOrderStatusException;
+use Travelhood\OtpSimplePay\Instant;
+use Travelhood\OtpSimplePay\Service;
 
 class OrderStatus extends Instant
 {
-    public function __construct(Service $service, $orderRef, $currency=null)
+    public function __construct(Service $service, $orderRef, $currency = null)
     {
         parent::__construct($service);
-        if($currency) {
+        if ($currency) {
             $this->service->config->selectCurrency($currency);
         }
         $data = [
@@ -24,7 +23,7 @@ class OrderStatus extends Instant
         $request = $this->service->createRequest($this->service->getUrlInstantOrderStatus(), $data);
         $request->setMethod('POST');
         $this->_data = $request->fetch();
-        if(!is_array($this->_data) || !array_key_exists('ORDER_STATUS', $this->_data)) {
+        if (!is_array($this->_data) || !array_key_exists('ORDER_STATUS', $this->_data)) {
             throw new InstantOrderStatusException('Failed to parse response');
         }
         $this->validate();

@@ -15,7 +15,7 @@ interface ProductCollectionInterface extends Countable, SeekableIterator
 
     function findIndex(Product $product);
 
-    function addProduct(Product $product, $quantity=1);
+    function addProduct(Product $product, $quantity = 1);
 
     function removeProductByCode($code);
 
@@ -29,11 +29,11 @@ interface ProductCollectionInterface extends Countable, SeekableIterator
 
     function countProduct(Product $product);
 
-    function sumProductByCode($code, $gross=true);
+    function sumProductByCode($code, $gross = true);
 
-    function sumProduct(Product $product, $gross=true);
+    function sumProduct(Product $product, $gross = true);
 
-    function sum($gross=true);
+    function sum($gross = true);
 
     function __toString();
 }
