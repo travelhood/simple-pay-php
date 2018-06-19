@@ -185,6 +185,7 @@ class Order extends Component
             'DELIVERY_CITY' => $this->getDeliveryCity(),
             'DELIVERY_STATE' => $this->getDeliveryState(),
             'DELIVERY_COUNTRYCODE' => $this->getDeliveryCountryCode(),
+            'SDK_VERSION' => Service::VERSION,
         ];
         $serial = '';
         foreach(self::HASH_FIELDS as $field) {
