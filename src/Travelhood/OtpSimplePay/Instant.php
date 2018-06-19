@@ -40,8 +40,15 @@ abstract class Instant extends Component
 
     public function parse($raw)
     {
-        $raw2 = substr($raw, 10, -11); // strip <epayment> tag
-        $split = explode('|', $raw2);
+        $dom = new \DOMDocument();
+        $dom->loadHTML($raw);
+        $epayment = $dom->getElementsByTagName('epayment');
+        if(count($epayment) < 1) {
+            $body = $dom->getElementsByTagName('body');
+            throw new Exception($body[0]->textContent);
+        }
+        //$raw2 = substr($raw, 10, -11); // strip <epayment> tag
+        $split = explode('|', $epayment[0]->textContent);
         return array_combine($this->_getKeyMap(), $split);
     }
 
