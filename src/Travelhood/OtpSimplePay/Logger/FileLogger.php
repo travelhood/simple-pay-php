@@ -46,7 +46,7 @@ class FileLogger extends AbstractLogger
         }
         $formatted = '['.date('Y-m-d H:i:s').'] ['.$level.'] '.$message;
         if(count($context) > 0) {
-            $formatted.= PHP_EOL.json_encode($context, JSON_PRETTY_PRINT|JSON_UNESCAPED_UNICODE|JSON_UNESCAPED_SLASHES);
+            $formatted.= ' '.json_encode($context, JSON_PRETTY_PRINT|JSON_UNESCAPED_UNICODE|JSON_UNESCAPED_SLASHES);
         }
         flock($this->_handle, LOCK_EX);
         $put = fputs($this->_handle, trim($formatted).PHP_EOL);
