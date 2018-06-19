@@ -42,6 +42,7 @@ if(!is_file($path)) {
         <div class="notification is-danger">
             <h2>Error!</h2>
             <h4><?= $e->getMessage() ?></h4>
+            <pre><?= $e->getTraceAsString() ?></pre>
         </div>
     <?php
     }
