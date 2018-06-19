@@ -4,6 +4,8 @@ namespace Travelhood\OtpSimplePay;
 
 use Psr\Log\LoggerAwareInterface;
 use Psr\Log\LoggerInterface;
+use Psr\Log\NullLogger;
+use Travelhood\OtpSimplePay\Logger\FileLogger;
 
 /**
  * @property Config $config
@@ -39,6 +41,12 @@ class Service extends Component implements LoggerAwareInterface
         parent::__construct($this);
         $this->_config = $config;
         $this->_hasher = new Hasher($this);
+        if(is_array($config['log'])) {
+            $this->_logger = new FileLogger($config['log']['path'], $config['log']['level']);
+        }
+        else {
+            $this->_logger = new NullLogger;
+        }
     }
 
     public function setLogger(LoggerInterface $logger)
