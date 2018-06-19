@@ -43,7 +43,7 @@ function getLastTag()
 function replaceInSource($filePath, $newVersion)
 {
     $source = file_get_contents($filePath);
-    $new = preg_replace('/const VERSION \= \'([\']+)\'\;/', 'const VERSION = \'travelhood-'.$newVersion.'\';', $source, 1);
+    $new = preg_replace('/const VERSION \= \'([^\']+)\'\;/', 'const VERSION = \'travelhood-'.$newVersion.'\';', $source, 1);
     return file_put_contents($filePath, $new);
 }
 
