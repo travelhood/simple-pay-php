@@ -70,9 +70,7 @@ echo 'Bumping ', $level, PHP_EOL;
 $lastTag = getLastTag();
 $newTag = $lastTag;
 $newTag[$level]++;
-var_dump($newTag);exit;
 $newVersion = 'v'.join('.', $newTag);
-
 echo 'New tag will be ', $newVersion, PHP_EOL;
 
 if(!replaceInSource(SOURCE_FILE, $newVersion)) {
