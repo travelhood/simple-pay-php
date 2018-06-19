@@ -2,11 +2,14 @@
 
 namespace Travelhood\OtpSimplePay;
 
+use Psr\Log\LoggerAwareInterface;
+use Psr\Log\LoggerInterface;
+
 /**
  * @property Config $config
  * @property Hasher $hasher
  */
-class Service extends Component
+class Service extends Component implements LoggerAwareInterface
 {
     const VERSION = 'travelhood-v0.1.12';
     const URL_LIVE = "https://secure.simplepay.hu/payment/";
@@ -36,6 +39,11 @@ class Service extends Component
         parent::__construct($this);
         $this->_config = $config;
         $this->_hasher = new Hasher($this);
+    }
+
+    public function setLogger(LoggerInterface $logger)
+    {
+        $this->_logger = $logger;
     }
 
     /**
