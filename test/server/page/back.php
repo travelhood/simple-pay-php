@@ -3,8 +3,13 @@
 require_once __DIR__ . '/../bootstrap.php';
 global $simplePay;
 
-
 $page = $simplePay->pageBack();
+
+if(isset($_GET['idn']) && $_GET['idn']) {
+    $data = $simplePay->instantDeliveryNotification($page->getSimplePayRef(), 1)->getData();
+    var_dump($data);exit;
+}
+
 $status = $simplePay->instantOrderStatus($page->getOrderRef(), $page->getOrderCurrency());
 
 ?>
@@ -41,6 +46,18 @@ $status = $simplePay->instantOrderStatus($page->getOrderRef(), $page->getOrderCu
 </table>
 
 <hr/>
+
+<?php
+if($status->getOrderStatus() == \Travelhood\OtpSimplePay\Enum\Status::PAYMENT_AUTHORIZED) {
+?>
+    <a class="button is-primary" href="?<?= http_build_query($_GET); ?>&idn=1">
+        <i class="fa fa-check"></i>
+        &nbsp;
+        Send delivery notification
+    </a>
+<?php
+}
+?>
 
 <a class="button is-danger" href="/">
     <i class="fa fa-chevron-left"></i>
