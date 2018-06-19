@@ -37,6 +37,31 @@ class ConfigTest extends BaseTest
         $this->assertGreaterThan(0, strlen($config['merchant']['HUF']['secret']));
     }
 
+    public function testMerge()
+    {
+        $a = [
+            'merchant' => [
+                'HUF' => ['id'=>'<id>', 'secret'=>'<secret1>'],
+            ],
+            'timeout' => 60,
+        ];
+        $b = [
+            'merchant' => [
+                'HUF' => ['id'=>'<id>', 'secret'=>'<secret2>'],
+                'EUR' => ['id'=>'<id>', 'secret'=>'<secret>'],
+            ],
+            'timeout' => 90,
+        ];
+        $config = new \Travelhood\OtpSimplePay\Config($a);
+        $this->assertEquals('<id>', $config['merchant']['HUF']['id']);
+        $this->assertEquals('<secret1>', $config['merchant']['HUF']['secret']);
+        $this->assertArrayNotHasKey('EUR', $config['merchant']);
+        $config->mergeConfig($b);
+        $this->assertEquals('<id>', $config['merchant']['HUF']['id']);
+        $this->assertEquals('<secret2>', $config['merchant']['HUF']['secret']);
+        $this->assertArrayHasKey('EUR', $config['merchant']);
+    }
+
     public function testSelectCurrency()
     {
         $config = new \Travelhood\OtpSimplePay\Config([

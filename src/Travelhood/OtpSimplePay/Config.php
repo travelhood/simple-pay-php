@@ -116,6 +116,21 @@ class Config implements ArrayAccess
     }
 
     /**
+     * @param $config
+     * @return $this
+     * @throws ConfigException
+     */
+    public function mergeConfig($config)
+    {
+        if($config instanceof self) {
+            $config = $config->_config;
+        }
+        $this->_config = Util::mergeArray($this->_config, $config);
+        $this->validate();
+        return $this;
+    }
+
+    /**
      * @throws ConfigException
      */
     public function validate()
