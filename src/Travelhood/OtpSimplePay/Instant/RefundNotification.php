@@ -11,7 +11,7 @@ class RefundNotification extends Instant
     {
         parent::__construct($service);
         if ($currency) {
-            $this->service->config->selectCurrency($currency);
+            $this->service->selectCurrency($currency);
         }
         $query = [
             'MERCHANT' => $this->service->config['merchant_id'],

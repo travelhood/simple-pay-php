@@ -4,7 +4,7 @@ global $simplePay;
 
 $orderRef = 'TO'.md5(microtime(true));
 
-$simplePay->config->selectCurrency('HUF');
+$simplePay->selectCurrency('HUF');
 $order = $simplePay->createOrder($orderRef);
 $order->products->addProduct(new \Travelhood\OtpSimplePay\Product('Product 1', 'sku123', 'Some nice product', 5000, .27));
 $order->products->addProduct(new \Travelhood\OtpSimplePay\Product('Product 2', 'sku456', 'Another awesome product', 10000, .14), 5);

@@ -48,7 +48,7 @@ class Back extends Page
             }
             $fullUrl = $protocol . '://' . $_SERVER['HTTP_HOST'] . $port . $_SERVER['REQUEST_URI'];
             $checkUrl = preg_replace("/\&" . self::KEY_CONTROL_HASH . "\=.+$/", '', $fullUrl);
-            $this->service->config->selectCurrency($this[self::KEY_ORDER_CURRENCY]);
+            $this->service->selectCurrency($this[self::KEY_ORDER_CURRENCY]);
             $hash = $this->service->hasher->hashString($checkUrl, true);
             if ($hash != $this[self::KEY_CONTROL_HASH]) {
                 throw new ControlMismatchException('Control variable mismatch! [' . $fullUrl . ']');

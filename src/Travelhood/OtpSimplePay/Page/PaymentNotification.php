@@ -47,7 +47,7 @@ class PaymentNotification extends Page
         if (!array_key_exists('CURRENCY', $data)) {
             throw new InstantPaymentNotificationException('Invalid request received');
         }
-        $this->service->config->selectCurrency($data['CURRENCY']);
+        $this->service->selectCurrency($data['CURRENCY']);
         $check = $data;
         unset($check['HASH']);
         $hash = $this->service->hasher->hashArray($check);

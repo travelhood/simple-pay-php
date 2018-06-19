@@ -23,7 +23,7 @@ class HasherTest extends BaseTest
      */
     public function testArray($array, $expectedHash)
     {
-        $this->simplePay->config->selectCurrency('HUF');
+        $this->simplePay->selectCurrency('HUF');
         $hash = $this->simplePay->hasher->hashArray($array);
         $this->assertEquals($expectedHash, $hash);
     }

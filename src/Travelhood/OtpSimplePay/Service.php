@@ -47,6 +47,18 @@ class Service extends Component implements LoggerAwareInterface
     }
 
     /**
+     * @param string $currency
+     * @return $this
+     * @throws Exception\ConfigException
+     */
+    public function selectCurrency($currency)
+    {
+        $this->_config->selectCurrency($currency);
+        $this->log->info('Selected currency: '.$currency);
+        return $this;
+    }
+
+    /**
      * @param string $name
      * @return mixed
      */
@@ -101,6 +113,11 @@ class Service extends Component implements LoggerAwareInterface
 
     public function createRequest($url, $query = [])
     {
+        $this->log->debug('Creating request object', [
+            'curl' => $this->config['curl'],
+            'url' => $url,
+            'query' => $query,
+        ]);
         if ($this->config['curl']) {
             return new Request\Curl($url, $query);
         }
