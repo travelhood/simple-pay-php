@@ -32,7 +32,7 @@ class Component
     {
         switch ($name) {
             case 'log':
-                return $this->_service->log;
+                return $this->_service->_logger;
             case 'service':
                 return $this->_service;
         }
