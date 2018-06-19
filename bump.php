@@ -37,6 +37,20 @@ function parseLevel($params)
 function getLastTag()
 {
     $tags = array_filter(explode("\n", `git tag`));
+    //sort($tags, SORT_NATURAL);
+    usort($tags, function($a, $b) {
+        $ea = explode('.', $a);
+        $eb = explode('.', $b);
+        $ea[0] = str_replace('v','',$ea[0]);
+        $eb[0] = str_replace('v','',$eb[0]);
+        if($ea[0] < $eb[0]) return -1;
+        if($ea[0] > $eb[0]) return 1;
+        if($ea[1] < $eb[1]) return -1;
+        if($ea[1] > $eb[1]) return 1;
+        if($ea[2] < $eb[2]) return -1;
+        if($ea[2] > $eb[2]) return 1;
+        return 0;
+    });
     return parseSemantic($tags[count($tags)-1]);
 }
 
@@ -51,9 +65,12 @@ $params = $argv;
 array_shift($params);
 
 $level = parseLevel($params);
+echo 'Bumping ', $level, PHP_EOL;
+
 $lastTag = getLastTag();
 $newTag = $lastTag;
 $newTag[$level]++;
+var_dump($newTag);exit;
 $newVersion = 'v'.join('.', $newTag);
 
 echo 'New tag will be ', $newVersion, PHP_EOL;
