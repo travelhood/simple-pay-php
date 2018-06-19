@@ -2,3 +2,6 @@
 /vendor/
 /composer.lock
 /test/fixture/config.local.php
+
+**/*.log
+!**/.gitkeep
