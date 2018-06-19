@@ -8,6 +8,7 @@ namespace Travelhood\OtpSimplePay;
  */
 class Service extends Component
 {
+    const VERSION = 'travelhood-';
     const URL_LIVE = "https://secure.simplepay.hu/payment/";
     const URL_SANDBOX = "https://sandbox.simplepay.hu/payment/";
     const URL_LIVE_UPDATE = "order/lu.php";
