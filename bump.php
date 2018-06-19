@@ -55,6 +55,9 @@ $lastTag = getLastTag();
 $newTag = $lastTag;
 $newTag[$level]++;
 $newVersion = 'v'.join('.', $newTag);
+
+echo 'New tag will be ', $newVersion, PHP_EOL;
+
 if(!replaceInSource(SOURCE_FILE, $newVersion)) {
     throw new RuntimeException('Failed to replace version in source file: '.SOURCE_FILE);
 }
