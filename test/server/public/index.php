@@ -26,7 +26,26 @@ require_once __DIR__ . '/../bootstrap.php';
 
 <div class="container">
 <?php
-include __DIR__ . '/../page'.$_SERVER['PHP_SELF'];
+$path = __DIR__ . '/../page'.$_SERVER['PHP_SELF'];
+if(!is_file($path)) {
+?>
+    <div class="notification is-warning">
+        <h2>404</h2>
+        <h4>No such page!</h4>
+    </div>
+<?php
+} else {
+    try {
+        include $path;
+    }
+    catch(\Throwable $e) { ?>
+        <div class="notification is-danger">
+            <h2>Error!</h2>
+            <h4><?= $e->getMessage() ?></h4>
+        </div>
+    <?php
+    }
+}
 ?>
 </div>
 
