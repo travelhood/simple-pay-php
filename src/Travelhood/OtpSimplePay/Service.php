@@ -34,10 +34,11 @@ class Service extends Component implements LoggerAwareInterface
         $this->_config = $config;
         $this->_hasher = new Hasher($this);
         if (is_array($config['log'])) {
-            $this->_logger = new FileLogger($config['log']['path'], $config['log']['level']);
+            $this->_logger = new FileLogger($config['log']['path'], $config['log']['level'], $config['log']['prefix']);
         } else {
             $this->_logger = new NullLogger;
         }
+        $this->log->debug('Service instance created');
     }
 
     public function setLogger(LoggerInterface $logger)

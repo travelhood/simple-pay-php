@@ -16,6 +16,7 @@ class Config implements ArrayAccess
         'log' => [
             'level' => 'DEBUG',
             'path' => __DIR__ . '/../log/simplepay.log',
+            'prefix' => 'SimplePay: ',
         ],
         'merchant' => [],
     ];

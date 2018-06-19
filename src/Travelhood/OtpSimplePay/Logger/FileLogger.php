@@ -11,9 +11,10 @@ class FileLogger extends AbstractLogger
 
     protected $_path;
     protected $_level;
+    protected $_prefix;
     protected $_handle;
 
-    public function __construct($path, $level = 'debug')
+    public function __construct($path, $level = 'debug', $prefix='')
     {
         if (!is_file($path)) {
             touch($path);
@@ -21,10 +22,17 @@ class FileLogger extends AbstractLogger
         }
         $this->_path = $path;
         $this->_level = array_search(strtolower($level), self::LEVELS);
+        $this->_prefix = $prefix;
         $this->_handle = fopen($path, 'a+');
         if (!is_resource($this->_handle)) {
             throw new RuntimeException('Failed to open handle for logging to file: ' . $path);
         }
+    }
+
+    public function setPrefix($prefix)
+    {
+        $this->_prefix = $prefix;
+        return $this;
     }
 
     public function __destruct()
@@ -44,7 +52,7 @@ class FileLogger extends AbstractLogger
         if (!is_resource($this->_handle)) {
             throw new RuntimeException('No open handle to log to');
         }
-        $formatted = '[' . date('Y-m-d H:i:s') . '] [' . $level . '] ' . $message;
+        $formatted = '[' . date('Y-m-d H:i:s') . '] [' . $level . '] ' . $this->_prefix . $message;
         if (count($context) > 0) {
             $formatted .= ' ' . json_encode($context, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
         }
