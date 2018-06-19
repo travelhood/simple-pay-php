@@ -14,6 +14,10 @@ return [
     'curl' => true,
     'live' => false,
     'timeout' => 60,
+    'log' => [
+        'level' => 'DEBUG',
+        'path' => __DIR__ . '/../log/simplepay.log',
+    ],
     'url' => [
         'back' => 'http://'.$devConfig['server']['domain'].$port.'/back.php',
         'timeout' => 'http://'.$devConfig['server']['domain'].$port.'/timeout.php',

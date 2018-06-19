@@ -12,6 +12,12 @@ class Config implements ArrayAccess
 
     const DEFAULT_CONFIG = [
         'timeout' => 60,
+        'curl' => true,
+        'live' => false,
+        'log' => [
+            'level' => 'DEBUG',
+            'path' => __DIR__ . '/../log/simplepay.log',
+        ],
         'merchant' => [],
     ];
 
