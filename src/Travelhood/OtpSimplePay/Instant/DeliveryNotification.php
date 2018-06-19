@@ -23,8 +23,10 @@ class DeliveryNotification extends Instant
         ];
         $hash = $this->service->hasher->hashArray($query);
         $query['ORDER_HASH'] = $hash;
+        $this->log->info('IDN request', $query);
         $request = $this->service->createRequest($this->service->getUrlInstantDeliveryNotification(), $query);
         $this->_data = $request->fetch([$this, 'parse']);
+        $this->log->info('IDN response', $this->_data);
         $this->validate();
     }
 

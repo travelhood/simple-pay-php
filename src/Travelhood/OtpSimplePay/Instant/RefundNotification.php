@@ -23,8 +23,10 @@ class RefundNotification extends Instant
         ];
         $hash = $this->service->hasher->hashArray($query);
         $query['ORDER_HASH'] = $hash;
+        $this->log->info('IRN request', $query);
         $request = $this->service->createRequest($this->service->getUrlInstantRefundNotification(), $query);
         $this->_data = $request->fetch([$this, 'parse']);
         $this->validate();
+        $this->log->info('IRN response', $this->_data);
     }
 }

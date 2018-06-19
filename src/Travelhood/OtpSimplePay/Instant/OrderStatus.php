@@ -22,11 +22,13 @@ class OrderStatus extends Instant
         $data['HASH'] = $hash;
         $request = $this->service->createRequest($this->service->getUrlInstantOrderStatus(), $data);
         $request->setMethod('POST');
+        $this->log->info('IOS request', $data);
         $this->_data = $request->fetch();
         if (!is_array($this->_data) || !array_key_exists('ORDER_STATUS', $this->_data)) {
             throw new InstantOrderStatusException('Failed to parse response');
         }
         $this->validate();
+        $this->log->info('IOS response', $this->_data);
     }
 
     public function getOrderRef()
