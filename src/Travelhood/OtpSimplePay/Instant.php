@@ -21,6 +21,7 @@ abstract class Instant extends Component
         $epayment = $dom->getElementsByTagName('epayment');
         if (count($epayment) < 1) {
             $body = $dom->getElementsByTagName('body');
+            $this->log->critical($body[0]->textContent);
             throw new Exception($body[0]->textContent);
         }
         //$raw2 = substr($raw, 10, -11); // strip <epayment> tag
@@ -43,14 +44,18 @@ abstract class Instant extends Component
     {
         $key = $this->_getHashKey();
         $data = $this->_data;
+        $this->log->debug('Validating instant request', $data);
         unset($data[$key]);
         $hash = $this->service->hasher->hashArray($data);
         if ($hash != $this->_data[$key]) {
-            throw new Exception('Failed to validate hash');
+            $this->log->critical('Failed to validate instant hash');
+            throw new Exception('Failed to validate instant hash');
         }
         if ($this->getResponseCode() !== null && $this->getResponseCode() !== 1) {
+            $this->log->critical($this->getResponseText().' #'.$this->getResponseCode());
             throw new InstantDeliveryNotificationException($this->getResponseText(), $this->getResponseCode());
         }
+        $this->log->debug('Validated instant request');
     }
 
     protected function _getHashKey()

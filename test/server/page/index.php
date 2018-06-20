@@ -77,7 +77,7 @@ $liveUpdate = $simplePay->liveUpdate();
 <div class="has-text-right">
     <?=
     $liveUpdate->generateForm($order, null, function($formId) {
-        return '<button type="submit" class="button is-primary"><i class="fa fa-money-bill-wave"></i> &nbsp; Start SimplePay Transaction</button>';
+        return '<button type="submit" class="button is-primary" form="'.$formId.'"><i class="fa fa-money-bill-wave"></i> &nbsp; Start SimplePay Transaction</button>';
     })
     ?>
 </div>

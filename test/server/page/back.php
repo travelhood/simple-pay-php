@@ -3,10 +3,16 @@
 require_once __DIR__ . '/../bootstrap.php';
 global $simplePay;
 
+$amount = (isset($_GET['amount'])&&$_GET['amount']) ? intval($_GET['amount']) : 55084;
 $page = $simplePay->pageBack();
 
 if(isset($_GET['idn']) && $_GET['idn']) {
-    $data = $simplePay->instantDeliveryNotification($page->getSimplePayRef(), 1)->getData();
+    $data = $simplePay->instantDeliveryNotification($page->getSimplePayRef(), $amount)->getData();
+    var_dump($data);exit;
+}
+
+if(isset($_GET['irn']) && $_GET['irn']) {
+    $data = $simplePay->instantRefundNotification($page->getSimplePayRef(), $amount, $amount)->getData();
     var_dump($data);exit;
 }
 
@@ -47,17 +53,18 @@ $status = $simplePay->instantOrderStatus($page->getOrderRef(), $page->getOrderCu
 
 <hr/>
 
-<?php
-if($status->getOrderStatus() == \Travelhood\OtpSimplePay\Enum\Status::PAYMENT_AUTHORIZED) {
-?>
+<?php if($status->getOrderStatus() == \Travelhood\OtpSimplePay\Enum\Status::PAYMENT_AUTHORIZED) : ?>
     <a class="button is-primary" href="?<?= http_build_query($_GET); ?>&idn=1">
         <i class="fa fa-check"></i>
         &nbsp;
         Send delivery notification
     </a>
-<?php
-}
-?>
+    <a class="button is-warning" href="?<?= http_build_query($_GET); ?>&irn=1">
+        <i class="fa fa-times"></i>
+        &nbsp;
+        Send refund notification
+    </a>
+<?php endif ?>
 
 <a class="button is-danger" href="/">
     <i class="fa fa-chevron-left"></i>

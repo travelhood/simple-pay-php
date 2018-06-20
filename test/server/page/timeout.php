@@ -6,13 +6,13 @@ global $simplePay;
 ?>
 
 <?php if($simplePay->pageTimeout()->isUserAction()) : ?>
-<div class="notification is-warning">
-User has cancelled the transaction
-</div>
-<?php else: ?>
-<div class="notification is-danger">
-The transaction has timed out
-</div>
+    <div class="notification is-warning">
+        User has cancelled the transaction
+    </div>
+<?php else : ?>
+    <div class="notification is-danger">
+        The transaction has timed out
+    </div>
 <?php endif ?>
 
 <hr/>
