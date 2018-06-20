@@ -3,12 +3,19 @@
 namespace Travelhood\OtpSimplePay\Page;
 
 use Travelhood\OtpSimplePay\Page;
+use Travelhood\OtpSimplePay\Service;
 
 class Timeout extends Page
 {
     public function getData()
     {
         return $_GET;
+    }
+
+    public function __construct(Service $service)
+    {
+        parent::__construct($service);
+        $this->log->debug($this->__toString());
     }
 
     public function __toString()
