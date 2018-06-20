@@ -30,10 +30,10 @@ class Back extends Page
      */
     public function validate()
     {
-        if (!$this->offsetExists(self::KEY_ORDER_CURRENCY)) {
-            throw new PageException(self::KEY_ORDER_CURRENCY . ' must be passed along in the url');
-        }
         if ($this->offsetExists(self::KEY_CONTROL_HASH)) {
+            if (!$this->offsetExists(self::KEY_ORDER_CURRENCY)) {
+                throw new PageException(self::KEY_ORDER_CURRENCY . ' must be passed along in the url');
+            }
             $port = $_SERVER['SERVER_PORT'];
             if ($port == 80 || $port == 443) {
                 $port = '';
