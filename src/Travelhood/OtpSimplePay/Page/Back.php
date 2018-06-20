@@ -31,7 +31,9 @@ class Back extends Page
     public function validate()
     {
         if ($this->offsetExists(self::KEY_CONTROL_HASH)) {
+            $this->log->info('Validating Back page', $this->toArray());
             if (!$this->offsetExists(self::KEY_ORDER_CURRENCY)) {
+                $this->log->critical(self::KEY_ORDER_CURRENCY . ' must be passed along in the url');
                 throw new PageException(self::KEY_ORDER_CURRENCY . ' must be passed along in the url');
             }
             $port = $_SERVER['SERVER_PORT'];
@@ -51,8 +53,10 @@ class Back extends Page
             $this->service->selectCurrency($this[self::KEY_ORDER_CURRENCY]);
             $hash = $this->service->hasher->hashString($checkUrl, true);
             if ($hash != $this[self::KEY_CONTROL_HASH]) {
+                $this->log->critical('Control variable mismatch! [' . $fullUrl . ']');
                 throw new ControlMismatchException('Control variable mismatch! [' . $fullUrl . ']');
             }
+            $this->log->info('Validated Back page');
         }
     }
 

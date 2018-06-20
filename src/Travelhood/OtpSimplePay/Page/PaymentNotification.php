@@ -38,13 +38,20 @@ class PaymentNotification extends Page
             'DATE' => $date,
         ];
         $hash = $this->service->hasher->hashArray($check);
+        $this->log->info('Confirmed IPN', [
+            'request'=>$this->getData(),
+            'date'=>$date,
+            'hash'=>$hash
+        ]);
         return '<EPAYMENT>' . $date . '|' . $hash . '</EPAYMENT>';
     }
 
     public function validate()
     {
+        $this->log->debug('Validating IPN', $this->getData());
         $data = $this->getData();
         if (!array_key_exists('CURRENCY', $data)) {
+            $this->log->critical('Invalid request received');
             throw new InstantPaymentNotificationException('Invalid request received');
         }
         $this->service->selectCurrency($data['CURRENCY']);
@@ -52,14 +59,127 @@ class PaymentNotification extends Page
         unset($check['HASH']);
         $hash = $this->service->hasher->hashArray($check);
         if ($hash != $data['HASH']) {
-            throw new InstantPaymentNotificationException('Invalid hash received');
+            $this->log->critical('Invalid hash received', $this->getData());
+            throw new InstantPaymentNotificationException('Invalid hash received for order '.$this->getOrderRef());
         }
+        $this->log->info('Validated IPN');
     }
 
     public function getData()
     {
         return $_POST;
     }
+
+    #region getters
+
+    /* Sample request data:
+        "SALEDATE": "2018-06-19 12:21:29",
+        "REFNO": "...",
+        "REFNOEXT": "...",
+        "ORDERNO": "",
+        "ORDERSTATUS": "PAYMENT_AUTHORIZED",
+        "PAYMETHOD": "CCVISAMC",
+        "FIRSTNAME": "...",
+        "LASTNAME": "...",
+        "IDENTITY_NO": "",
+        "IDENTITY_ISSUER": "",
+        "IDENTITY_CNP": "",
+        "REGISTRATIONNUMBER": "",
+        "CBANKNAME": "",
+        "CBANKACCOUNT": "",
+        "ADDRESS1": "...",
+        "CITY": "...",
+        "STATE": "...",
+        "ZIPCODE": "...",
+        "COUNTRY": "...",
+        "PHONE": "...",
+        "CUSTOMEREMAIL": "...",
+        "FIRSTNAME_D": "...",
+        "LASTNAME_D": "...",
+        "COMPANY_D": "",
+        "ADDRESS1_D": "...",
+        "CITY_D": "...",
+        "ZIPCODE_D": "...",
+        "COUNTRY_D": "...",
+        "PHONE_D": "...",
+        "IPADDRESS": "...",
+        "CURRENCY": "...",
+        "IPN_PID": [
+            "895177222",
+            "670493899"
+        ],
+        "IPN_PNAME": [
+            "Product 1",
+            "Product 2"
+        ],
+        "IPN_PCODE": [
+            "sku123",
+            "sku456"
+        ],
+        "IPN_INFO": [
+            "Some nice product",
+            "Another awesome product"
+        ],
+        "IPN_QTY": [
+            "1",
+            "5"
+        ],
+        "IPN_PRICE": [
+            "5000",
+            "10000"
+        ],
+        "IPN_VAT": [
+            "0.27",
+            "0.14"
+        ],
+        "IPN_VER": [
+            "",
+            ""
+        ],
+        "IPN_DISCOUNT": [
+            "",
+            ""
+        ],
+        "IPN_PROMONAME": [
+            "",
+            ""
+        ],
+        "IPN_DELIVEREDCODES": [
+            "",
+            ""
+        ],
+        "IPN_TOTAL": [
+            "5013.5",
+            "50070.0"
+        ],
+        "IPN_TOTALGENERAL": "55084.0",
+        "IPN_SHIPPING": "0.0",
+        "IPN_COMMISSION": "0.00",
+        "IPN_DATE": "20180620111958",
+        "HASH": "..."
+     */
+
+    public function getSalesDate()
+    {
+        return $this['SALESDATE'];
+    }
+
+    public function getOrderRef()
+    {
+        return $this['REFNOEXT'];
+    }
+
+    public function getSimplePayRef()
+    {
+        return $this['REFNO'];
+    }
+
+    public function getOrderStatus()
+    {
+        return $this['ORDER_STATUS'];
+    }
+
+    #endregion
 
 
 }
