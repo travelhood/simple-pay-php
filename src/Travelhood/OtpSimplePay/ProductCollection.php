@@ -83,11 +83,11 @@ class ProductCollection implements ProductCollectionInterface
     }
 
     /**
-     * @param Product $product
+     * @param ProductInterface $product
      * @param int $quantity
      * @return $this
      */
-    public function addProduct(Product $product, $quantity = 1)
+    public function addProduct(ProductInterface $product, $quantity = 1)
     {
         $position = $this->findIndex($product);
         if ($position >= 0) {
@@ -101,10 +101,10 @@ class ProductCollection implements ProductCollectionInterface
     }
 
     /**
-     * @param Product $product
+     * @param ProductInterface $product
      * @return int
      */
-    public function findIndex(Product $product)
+    public function findIndex(ProductInterface $product)
     {
         return $this->findIndexByCode($product->getCode());
     }
@@ -124,11 +124,11 @@ class ProductCollection implements ProductCollectionInterface
     }
 
     /**
-     * @param Product $product
+     * @param ProductInterface $product
      * @param int $limit
      * @return $this
      */
-    public function removeProduct(Product $product, $limit = 0)
+    public function removeProduct(ProductInterface $product, $limit = 0)
     {
         return $this->removeProductByCode($product->getCode(), $limit);
     }
@@ -153,12 +153,12 @@ class ProductCollection implements ProductCollectionInterface
     }
 
     /**
-     * @param Product $product
+     * @param ProductInterface $product
      * @param int $quantity
      * @return $this
      * @throws ProductCollectionException
      */
-    public function setProductQuantity(Product $product, $quantity)
+    public function setProductQuantity(ProductInterface $product, $quantity)
     {
         return $this->setProductQuantityByCode($product->getCode(), $quantity);
     }
@@ -204,7 +204,12 @@ class ProductCollection implements ProductCollectionInterface
         return null;
     }
 
-    function sumProduct(Product $product, $gross = true)
+    /**
+     * @param ProductInterface $product
+     * @param bool $gross
+     * @return float
+     */
+    function sumProduct(ProductInterface $product, $gross = true)
     {
         $s = $this->countProduct($product) * $product->getPrice();
         if ($gross) {
@@ -214,10 +219,10 @@ class ProductCollection implements ProductCollectionInterface
     }
 
     /**
-     * @param Product $product
+     * @param ProductInterface $product
      * @return int
      */
-    public function countProduct(Product $product)
+    public function countProduct(ProductInterface $product)
     {
         return $this->countProductByCode($product->getCode());
     }
