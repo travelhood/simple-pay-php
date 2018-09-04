@@ -15,42 +15,27 @@ abstract class Request implements RequestInterface
     /** @var array */
     protected $_query = [];
 
-    /**
-     * Request constructor.
-     * @param string $url
-     * @param array $query
-     */
     public function __construct($url, $query = [])
     {
         $this->setUrl($url);
         $this->setQuery($query);
     }
 
-    /**
-     * @param string $url
-     * @return $this
-     */
+    /** @inheritdoc */
     public function setUrl($url)
     {
         $this->_url = $url;
         return $this;
     }
 
-    /**
-     * @param array $query
-     * @return $this
-     */
+    /** @inheritdoc */
     public function setQuery(array $query)
     {
         $this->_query = $query;
         return $this;
     }
 
-    /**
-     * @param string $method
-     * @return $this
-     * @throws RequestException
-     */
+    /** @inheritdoc */
     public function setMethod($method)
     {
         switch ($method) {
@@ -64,22 +49,15 @@ abstract class Request implements RequestInterface
         return $this;
     }
 
-    /**
-     * @param string $raw
-     * @param callable $parser
-     * @return array
-     */
+    /** @inheritdoc */
     public function parse($raw, $parser = null)
     {
-        if ($parser) {
+        if (is_callable($parser)) {
             return $parser($raw);
         }
         return (array)simplexml_load_string($raw);
     }
 
-    /**
-     * @param callable $parser
-     * @return mixed
-     */
+    /** @inheritdoc */
     abstract public function fetch($parser = null);
 }

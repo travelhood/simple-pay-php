@@ -176,7 +176,7 @@ class PaymentNotification extends Page
 
     public function getOrderStatus()
     {
-        return $this['ORDER_STATUS'];
+        return $this['ORDERSTATUS'];
     }
 
     #endregion
