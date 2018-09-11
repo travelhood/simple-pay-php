@@ -77,6 +77,6 @@ if(!replaceInSource(SOURCE_FILE, $newVersion)) {
     throw new RuntimeException('Failed to replace version in source file: '.SOURCE_FILE);
 }
 
-echo `git tag ${newVersion}`;
 echo `git commit . -m "bump to ${newVersion}"`;
+echo `git tag ${newVersion}`;
 echo "Don't forget to push to remote!", PHP_EOL;
