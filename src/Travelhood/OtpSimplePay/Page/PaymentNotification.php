@@ -159,9 +159,9 @@ class PaymentNotification extends Page
         "HASH": "..."
      */
 
-    public function getSalesDate()
+    public function getDate()
     {
-        return $this['SALESDATE'];
+        return $this['SALEDATE'];
     }
 
     public function getOrderRef()
