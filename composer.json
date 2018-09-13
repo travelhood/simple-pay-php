@@ -16,6 +16,7 @@
     }
   ],
   "require": {
+    "ext-curl": "*",
     "psr/log": "@stable"
   },
   "autoload": {
