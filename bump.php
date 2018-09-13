@@ -4,54 +4,57 @@ chdir(__DIR__);
 
 const SOURCE_FILE = __DIR__ . '/src/Travelhood/OtpSimplePay/Service.php';
 
+$LEVEL_NAMES = ['major', 'minor', 'patch'];
+$LEVEL_KEYS = array_flip($LEVEL_NAMES);
+
 function parseSemantic($in)
 {
     if(!preg_match('/([\d]+)\.([\d]+)\.([\d]+)/', $in, $matches)) {
         throw new RuntimeException('Invalid version format: '.$in);
     }
     return [
-        'major' => intval($matches[1]),
-        'minor' => intval($matches[2]),
-        'patch' => intval($matches[3]),
+        intval($matches[1]),
+        intval($matches[2]),
+        intval($matches[3]),
     ];
 }
 
 function parseLevel($params)
 {
-    $level = 'patch';
     if(count($params)>0) {
         switch($params[0]) {
             case 'patch':
+                return 2;
             case 'minor':
+                return 1;
             case 'major':
-                $level = $params[0];
-                break;
-            default:
-                throw new InvalidArgumentException('Invalid parameter: '.$params[0]);
-                break;
+                return 0;
         }
+        throw new InvalidArgumentException('Invalid parameter: '.$params[0]);
     }
-    return $level;
+    return 2;
 }
 
 function getLastTag()
 {
-    $tags = array_filter(explode("\n", `git tag`));
-    //sort($tags, SORT_NATURAL);
-    usort($tags, function($a, $b) {
-        $ea = explode('.', $a);
-        $eb = explode('.', $b);
-        $ea[0] = str_replace('v','',$ea[0]);
-        $eb[0] = str_replace('v','',$eb[0]);
-        if($ea[0] < $eb[0]) return -1;
-        if($ea[0] > $eb[0]) return 1;
-        if($ea[1] < $eb[1]) return -1;
-        if($ea[1] > $eb[1]) return 1;
-        if($ea[2] < $eb[2]) return -1;
-        if($ea[2] > $eb[2]) return 1;
-        return 0;
-    });
-    return parseSemantic($tags[count($tags)-1]);
+    $lastTag = [0,0,0];
+    $tags = array_map(function($i) { return trim($i); }, explode("\n", trim(`git tag`)));
+    foreach($tags as $tag) {
+        $tag = parseSemantic($tag);
+        if($tag[1] > $lastTag[0]) {
+            $lastTag[0] = intval($tag[0]);
+            $lastTag[1] = intval($tag[1]);
+            $lastTag[2] = intval($tag[2]);
+        }
+        elseif($tag[1] == $lastTag[0] && $tag[1] > $lastTag[1]) {
+            $lastTag[1] = intval($tag[1]);
+            $lastTag[2] = intval($tag[2]);
+        }
+        elseif($tag[0] == $lastTag[0] && $tag[1] == $lastTag[1] && $tag[2] > $lastTag[2]) {
+            $lastTag[2] = intval($tag[2]);
+        }
+    }
+    return $lastTag;
 }
 
 function replaceInSource($filePath, $newVersion)
@@ -65,7 +68,7 @@ $params = $argv;
 array_shift($params);
 
 $level = parseLevel($params);
-echo 'Bumping ', $level, PHP_EOL;
+echo 'Bumping ', $LEVEL_NAMES[$level], PHP_EOL;
 
 $lastTag = getLastTag();
 $newTag = $lastTag;
