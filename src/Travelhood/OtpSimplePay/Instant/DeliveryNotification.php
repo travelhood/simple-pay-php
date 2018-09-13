@@ -19,7 +19,7 @@ class DeliveryNotification extends Instant
             'ORDER_REF' => $simplePayRef,
             'ORDER_AMOUNT' => $amount,
             'ORDER_CURRENCY' => $this->service->config->getCurrency(),
-            'DATE_IDN' => date('Y-m-d H:i:s'),
+            'IDN_DATE' => date('Y-m-d H:i:s'),
         ];
         $hash = $this->service->hasher->hashArray($query);
         $query['ORDER_HASH'] = $hash;
