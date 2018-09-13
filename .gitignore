@@ -2,6 +2,7 @@
 /vendor/
 /composer.lock
 /test/fixture/config.local.php
+/test/fixture/config.merchant.php
 
 **/*.log
 !**/.gitkeep
