@@ -41,20 +41,41 @@ function getLastTag()
     $tags = array_map(function($i) { return trim($i); }, explode("\n", trim(`git tag`)));
     foreach($tags as $tag) {
         $tag = parseSemantic($tag);
-        if($tag[1] > $lastTag[0]) {
-            $lastTag[0] = intval($tag[0]);
-            $lastTag[1] = intval($tag[1]);
-            $lastTag[2] = intval($tag[2]);
+        if($lastTag[0] == $tag[0]) {
+            if($lastTag[1] == $tag[1]) {
+                if($lastTag[2] < $tag[2]) {
+                    $lastTag[2] = $tag[2];
+                }
+            }
+            elseif($lastTag[1] < $tag[1]) {
+                $lastTag[1] = $tag[1];
+                $lastTag[2] = $tag[2];
+            }
         }
-        elseif($tag[1] == $lastTag[0] && $tag[1] > $lastTag[1]) {
-            $lastTag[1] = intval($tag[1]);
-            $lastTag[2] = intval($tag[2]);
-        }
-        elseif($tag[0] == $lastTag[0] && $tag[1] == $lastTag[1] && $tag[2] > $lastTag[2]) {
-            $lastTag[2] = intval($tag[2]);
+        elseif($lastTag[0] < $tag[0]) {
+            $lastTag[0] = $tag[0];
+            $lastTag[1] = $tag[1];
+            $lastTag[2] = $tag[2];
         }
     }
     return $lastTag;
+}
+
+function bumpTag($tag, $level)
+{
+    if($level == 0) {
+        $tag[0]++;
+        $tag[1] = 0;
+        $tag[2] = 0;
+    }
+    elseif($level == 1) {
+        $tag[1]++;
+        $tag[2] = 0;
+    }
+    elseif($level == 2) {
+        $tag[2]++;
+    }
+    return $tag;
 }
 
 function replaceInSource($filePath, $newVersion)
@@ -71,8 +92,7 @@ $level = parseLevel($params);
 echo 'Bumping ', $LEVEL_NAMES[$level], PHP_EOL;
 
 $lastTag = getLastTag();
-$newTag = $lastTag;
-$newTag[$level]++;
+$newTag = bumpTag($lastTag, $level);
 $newVersion = 'v'.join('.', $newTag);
 echo 'New tag will be ', $newVersion, PHP_EOL;
 
