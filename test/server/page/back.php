@@ -8,12 +8,42 @@ $page = $simplePay->pageBack();
 
 if(isset($_GET['idn']) && $_GET['idn']) {
     $data = $simplePay->instantDeliveryNotification($page->getSimplePayRef(), $amount)->getData();
-    var_dump($data);exit;
+?>
+    <div class="notification is-success">
+        <strong><i class="fa fa-check"></i> Successful delivery notification!</strong><br/>
+    </div>
+    <table class="table is-bordered is-striped is-narrow">
+        <tr>
+            <td>SimplePay transaction ID</td>
+            <th><?= $data['REFNO'] ?></th>
+        </tr>
+        <tr>
+            <td>Date of transaction</td>
+            <th><?= $data['DATE'] ?></th>
+        </tr>
+    </table>
+<?php
+    return;
 }
 
 if(isset($_GET['irn']) && $_GET['irn']) {
     $data = $simplePay->instantRefundNotification($page->getSimplePayRef(), $amount, $amount)->getData();
-    var_dump($data);exit;
+    ?>
+    <div class="notification is-success">
+        <strong><i class="fa fa-check"></i> Successful refund notification!</strong><br/>
+    </div>
+    <table class="table is-bordered is-striped is-narrow">
+        <tr>
+            <td>SimplePay transaction ID</td>
+            <th><?= $data['REFNO'] ?></th>
+        </tr>
+        <tr>
+            <td>Date of transaction</td>
+            <th><?= $data['DATE'] ?></th>
+        </tr>
+    </table>
+    <?php
+    return;
 }
 
 $status = $simplePay->instantOrderStatus($page->getOrderRef(), $page->getOrderCurrency());
