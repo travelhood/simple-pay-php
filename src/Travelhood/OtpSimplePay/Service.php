@@ -53,8 +53,10 @@ class Service extends Component implements LoggerAwareInterface
      */
     public function selectCurrency($currency)
     {
-        $this->_config->selectCurrency($currency);
-        $this->log->info('Selected currency: '.$currency);
+        if($this->_config->getCurrency() != $currency) {
+            $this->_config->selectCurrency($currency);
+            $this->log->info('Selected currency: ' . $currency);
+        }
         return $this;
     }
 
