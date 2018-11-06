@@ -6,22 +6,44 @@ use Travelhood\OtpSimplePay\Exception\ProductException;
 
 class Product implements ProductInterface
 {
-    const VALID_FIELDS = ['name', 'code', 'info', 'price', 'vat'];
+    const VALID_FIELDS = [
+        'name' => [
+            'required' => true,
+            'length' => 128,
+        ],
+        'code' => [
+            'required' => true,
+            'length' => 64,
+        ],
+        'info' => [
+            'required' => false,
+            'length' => 128,
+        ],
+        'price' => [
+            'required' => true,
+            'length' => 8,
+        ],
+        'vat' => [
+            'required' => true,
+            'length' => 2,
+        ],
+    ];
 
     /** @var string */
-    protected $_name = '';
+    protected $_name = null;
 
     /** @var string */
-    protected $_code = '';
+    protected $_code = null;
 
     /** @var string */
-    protected $_info = '';
+    protected $_info = null;
 
     /** @var float */
-    protected $_price = .0;
+    protected $_price = null;
 
     /** @var float */
-    protected $_vat = .0;
+    protected $_vat = null;
+
 
     /**
      * Product constructor.
@@ -31,17 +53,43 @@ class Product implements ProductInterface
      * @param float $price
      * @param float $vat
      */
-    public function __construct($name = '', $code = '', $info = '', $price = .0, $vat = .0)
+    public function __construct(
+        $name,
+        /** @noinspection PhpUnusedParameterInspection */
+        $code = null,
+        /** @noinspection PhpUnusedParameterInspection */
+        $info = null,
+        /** @noinspection PhpUnusedParameterInspection */
+        $price = null,
+        /** @noinspection PhpUnusedParameterInspection */
+        $vat = null
+    )
     {
         if (is_array($name)) {
             $this->fromArray($name);
         } else {
-            $this->_name = $name;
-            $this->_code = $code;
-            $this->_info = $info;
-            $this->_price = $price;
-            $this->_vat = $vat;
+            foreach (self::VALID_FIELDS as $f => $d) {
+                $this->{'_' . $f} = $$f;
+            }
         }
+    }
+
+    /**
+     * @return $this
+     * @throws ProductException
+     */
+    public function validate()
+    {
+        foreach (self::VALID_FIELDS as $f => $d) {
+            if ($this->{'_' . $f} === null) {
+                if ($d['required']) {
+                    throw new ProductException('Missing mandatory field: ' . $f);
+                }
+            } else {
+                $this->{'_' . $f} = substr($this->{'_' . $f}, 0, min(strlen($this->{'_' . $f}), $d['length']));
+            }
+        }
+        return $this;
     }
 
     /**
@@ -50,7 +98,7 @@ class Product implements ProductInterface
      */
     public function fromArray(array $array)
     {
-        foreach (self::VALID_FIELDS as $f) {
+        foreach (self::VALID_FIELDS as $f => $d) {
             $this->{'_' . $f} = $array[$f];
         }
         return $this;
@@ -74,7 +122,7 @@ class Product implements ProductInterface
      */
     public function offsetExists($offset)
     {
-        return in_array($offset, self::VALID_FIELDS);
+        return array_key_exists($offset, self::VALID_FIELDS);
     }
 
     /**
@@ -156,9 +204,11 @@ class Product implements ProductInterface
 
     /**
      * @return array
+     * @throws ProductException
      */
     public function toArray()
     {
+        $this->validate();
         return [
             'name' => $this->_name,
             'code' => $this->_code,
@@ -168,6 +218,9 @@ class Product implements ProductInterface
         ];
     }
 
+    /**
+     * @return string
+     */
     public function __toString()
     {
         return $this->getName() . ' - ' . $this->getCode();

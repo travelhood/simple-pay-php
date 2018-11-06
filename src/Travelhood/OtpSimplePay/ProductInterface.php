@@ -3,9 +3,16 @@
 namespace Travelhood\OtpSimplePay;
 
 use ArrayAccess;
+use Travelhood\OtpSimplePay\Exception\ProductException;
 
 interface ProductInterface extends ArrayAccess
 {
+    /**
+     * @return $this
+     * @throws ProductException
+     */
+    function validate();
+
     /**
      * Sets the name of the product
      * @param string $name
