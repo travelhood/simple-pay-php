@@ -17,6 +17,7 @@
   ],
   "require": {
     "ext-curl": "*",
+    "ext-dom": "*",
     "psr/log": "@stable"
   },
   "autoload": {
