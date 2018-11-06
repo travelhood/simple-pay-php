@@ -19,6 +19,7 @@
     "ext-curl": "*",
     "ext-dom": "*",
     "ext-json": "*",
+    "ext-simplexml": "*",
     "psr/log": "@stable"
   },
   "autoload": {
