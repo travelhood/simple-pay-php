@@ -13,9 +13,23 @@ class RefundNotification extends Instant
         return 1;
     }
 
-    public function __construct(Service $service, $simplePayRef, $orderAmount, $refundAmount, $currency = null)
+    /**
+     * RefundNotification constructor.
+     * @param Service $service
+     * @param string $simplePayRef
+     * @param int $orderAmount
+     * @param int $refundAmount
+     * @param string $currency
+     * @throws \Travelhood\OtpSimplePay\Exception
+     * @throws \Travelhood\OtpSimplePay\Exception\ConfigException
+     * @throws \Travelhood\OtpSimplePay\Exception\InstantDeliveryNotificationException
+     */
+    public function __construct(Service $service, $simplePayRef, $orderAmount, $refundAmount=null, $currency = null)
     {
         parent::__construct($service);
+        if(!$refundAmount) {
+            $refundAmount = $orderAmount;
+        }
         if ($currency) {
             $this->service->selectCurrency($currency);
         }
@@ -25,7 +39,7 @@ class RefundNotification extends Instant
             'ORDER_AMOUNT' => $orderAmount,
             'ORDER_CURRENCY' => $this->service->config->getCurrency(),
             'IRN_DATE' => date('Y-m-d H:i:s'),
-            'AMOUNT' => $orderAmount,
+            'AMOUNT' => $refundAmount,
         ];
         $hash = $this->service->hasher->hashArray($query);
         $query['ORDER_HASH'] = $hash;
