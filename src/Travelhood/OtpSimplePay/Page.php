@@ -35,11 +35,20 @@ abstract class Page extends Component implements ArrayAccess
      */
     abstract public function getData();
 
+    /**
+     * @param string $offset
+     * @param mixed $value
+     * @throws PageException
+     */
     public function offsetSet($offset, $value)
     {
         throw new PageException('Trying to set read-only variable');
     }
 
+    /**
+     * @param string $offset
+     * @throws PageException
+     */
     public function offsetUnset($offset)
     {
         throw new PageException('Trying to set read-only variable');

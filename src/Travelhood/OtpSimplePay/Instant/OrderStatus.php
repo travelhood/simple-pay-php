@@ -8,6 +8,15 @@ use Travelhood\OtpSimplePay\Service;
 
 class OrderStatus extends Instant
 {
+    /**
+     * @param Service $service
+     * @param string $orderRef
+     * @param string $currency
+     * @throws InstantOrderStatusException
+     * @throws \Travelhood\OtpSimplePay\Exception
+     * @throws \Travelhood\OtpSimplePay\Exception\ConfigException
+     * @throws \Travelhood\OtpSimplePay\Exception\InstantDeliveryNotificationException
+     */
     public function __construct(Service $service, $orderRef, $currency = null)
     {
         parent::__construct($service);

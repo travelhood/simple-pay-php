@@ -41,6 +41,10 @@ class Service extends Component implements LoggerAwareInterface
         $this->log->debug('Service instance created');
     }
 
+    /**
+     * @param LoggerInterface $logger
+     * @return void
+     */
     public function setLogger(LoggerInterface $logger)
     {
         $this->_logger = $logger;
@@ -88,31 +92,53 @@ class Service extends Component implements LoggerAwareInterface
         return self::URL_SANDBOX;
     }
 
+    /**
+     * @return string
+     */
     public function getUrlInstantDeliveryNotification()
     {
         return $this->_getUrlBase() . self::URL_INSTANT_DELIVERY_NOTIFICATION;
     }
 
+    /**
+     * @return string
+     */
     public function getUrlInstantRefundNotification()
     {
         return $this->_getUrlBase() . self::URL_INSTANT_REFUND_NOTIFICATION;
     }
 
+    /**
+     * @return string
+     */
     public function getUrlInstantOrderStatus()
     {
         return $this->_getUrlBase() . self::URL_INSTANT_ORDER_STATUS;
     }
 
+    /**
+     * @return string
+     */
     public function getUrlTokens()
     {
         return $this->_getUrlBase() . self::URL_TOKENS;
     }
 
+    /**
+     * @param string $orderRef
+     * @param string $orderDate
+     * @return Order
+     */
     public function createOrder($orderRef, $orderDate = null)
     {
         return new Order($this, $orderRef, $orderDate);
     }
 
+    /**
+     * @param $url
+     * @param array $query
+     * @return RequestInterface
+     */
     public function createRequest($url, $query = [])
     {
         $this->log->debug('Creating request object', [
@@ -126,36 +152,77 @@ class Service extends Component implements LoggerAwareInterface
         return new Request\FileGetContents($url, $query);
     }
 
+    /**
+     * @return LiveUpdate
+     */
     public function liveUpdate()
     {
         return new LiveUpdate($this);
     }
 
+    /**
+     * @return Page\Back
+     */
     public function pageBack()
     {
         return new Page\Back($this);
     }
 
+    /**
+     * @return Page\Timeout
+     */
     public function pageTimeout()
     {
         return new Page\Timeout($this);
     }
 
+    /**
+     * @return Page\PaymentNotification
+     */
     public function pagePaymentNotification()
     {
         return new Page\PaymentNotification($this);
     }
 
+    /**
+     * @param string $orderRef
+     * @param string $currency
+     * @return Instant\OrderStatus
+     * @throws Exception
+     * @throws Exception\ConfigException
+     * @throws Exception\InstantDeliveryNotificationException
+     * @throws Exception\InstantOrderStatusException
+     */
     public function instantOrderStatus($orderRef, $currency = null)
     {
         return new Instant\OrderStatus($this, $orderRef, $currency);
     }
 
+    /**
+     * @param string $simplePayRef
+     * @param int $amount
+     * @param string $currency
+     * @return Instant\DeliveryNotification
+     * @throws Exception
+     * @throws Exception\ConfigException
+     * @throws Exception\InstantDeliveryNotificationException
+     * @throws Exception\RequestException
+     */
     public function instantDeliveryNotification($simplePayRef, $amount, $currency = null)
     {
         return new Instant\DeliveryNotification($this, $simplePayRef, $amount, $currency);
     }
 
+    /**
+     * @param string $simplePayRef
+     * @param int $orderAmount
+     * @param int $refundAmount
+     * @param string $currency
+     * @return Instant\RefundNotification
+     * @throws Exception
+     * @throws Exception\ConfigException
+     * @throws Exception\InstantDeliveryNotificationException
+     */
     public function instantRefundNotification($simplePayRef, $orderAmount, $refundAmount, $currency = null)
     {
         return new Instant\RefundNotification($this, $simplePayRef, $orderAmount, $refundAmount, $currency);

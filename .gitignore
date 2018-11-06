@@ -3,6 +3,7 @@
 /composer.lock
 /test/fixture/config.local.php
 /test/fixture/config.merchant.php
+**/*.off.php
 
 **/*.log
 !**/.gitkeep

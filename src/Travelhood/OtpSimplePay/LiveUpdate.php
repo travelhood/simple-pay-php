@@ -1,4 +1,5 @@
 <?php
+/** @noinspection XmlInvalidId */
 
 namespace Travelhood\OtpSimplePay;
 
@@ -16,19 +17,18 @@ class LiveUpdate extends Component
     const HTML_SUBMIT = '<button type="submit" form="%{form}">%{html}</button>' . PHP_EOL;
 
     /**
-     * @param Order $order
+     * @param OrderInterface $order
      * @param null $formId
      * @param string $submit
      * @return string
      * @throws Exception\OrderException
      * @throws LiveUpdateException
      */
-    public function generateForm(Order $order, $formId = null, $submit = self::DEFAULT_SUBMIT_TEXT)
+    public function generateForm(OrderInterface $order, $formId = null, $submit = self::DEFAULT_SUBMIT_TEXT)
     {
         if (!$formId) {
             $formId = self::DEFAULT_FORM_ID . '-' . $order->getOrderRef();
         }
-        $order->setPricesCurrency($this->service->config->getCurrency());
         $order->validate();
         $inputs = '';
         foreach ($order->toArray() as $k => $v) {

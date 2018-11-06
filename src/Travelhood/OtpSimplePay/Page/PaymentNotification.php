@@ -1,4 +1,5 @@
 <?php
+/** @noinspection HtmlUnknownTag */
 
 namespace Travelhood\OtpSimplePay\Page;
 
@@ -7,71 +8,6 @@ use Travelhood\OtpSimplePay\Page;
 
 class PaymentNotification extends Page
 {
-    protected $_date = null;
-
-    public function setDate($date)
-    {
-        $this->_date = $date;
-        return $this;
-    }
-
-    public function getMessage()
-    {
-        return $this->__toString();
-    }
-
-    public function __toString()
-    {
-        return $this->confirm();
-    }
-
-    public function confirm()
-    {
-        if (!$this->_date) {
-            $this->_date = date('YmdHis');
-        }
-        $date = preg_replace('/[^\d]/', '', $this->_date);
-        $check = [
-            'IPN_PID' => [$this['IPN_PID'][0]],
-            'IPN_PNAME' => [$this['IPN_PNAME'][0]],
-            'IPN_DATE' => preg_replace('/[^\d]/', '', $this['IPN_DATE']),
-            'DATE' => $date,
-        ];
-        $hash = $this->service->hasher->hashArray($check);
-        $this->log->info('Confirmed IPN', [
-            'request'=>$this->getData(),
-            'date'=>$date,
-            'hash'=>$hash
-        ]);
-        return '<EPAYMENT>' . $date . '|' . $hash . '</EPAYMENT>';
-    }
-
-    public function validate()
-    {
-        $this->log->debug('Validating IPN', $this->getData());
-        $data = $this->getData();
-        if (!array_key_exists('CURRENCY', $data)) {
-            $this->log->critical('Invalid request received');
-            throw new InstantPaymentNotificationException('Invalid request received');
-        }
-        $this->service->selectCurrency($data['CURRENCY']);
-        $check = $data;
-        unset($check['HASH']);
-        $hash = $this->service->hasher->hashArray($check);
-        if ($hash != $data['HASH']) {
-            $this->log->critical('Invalid hash received', $this->getData());
-            throw new InstantPaymentNotificationException('Invalid hash received for order '.$this->getOrderRef());
-        }
-        $this->log->info('Validated IPN');
-    }
-
-    public function getData()
-    {
-        return $_POST;
-    }
-
-    #region getters
-
     /* Sample request data:
         "SALEDATE": "2018-06-19 12:21:29",
         "REFNO": "...",
@@ -159,27 +95,124 @@ class PaymentNotification extends Page
         "HASH": "..."
      */
 
+    /** @var string */
+    protected $_date = null;
+
+    /**
+     * @param string $date
+     * @return $this
+     */
+    public function setDate($date)
+    {
+        $this->_date = $date;
+        return $this;
+    }
+
+    /**
+     * @return string
+     */
+    public function getMessage()
+    {
+        return $this->__toString();
+    }
+
+    /**
+     * @return string
+     */
+    public function __toString()
+    {
+        return $this->confirm();
+    }
+
+    /**
+     * @return string
+     */
+    public function confirm()
+    {
+        if (!$this->_date) {
+            $this->_date = date('YmdHis');
+        }
+        $date = preg_replace('/[^\d]/', '', $this->_date);
+        $check = [
+            'IPN_PID' => [$this['IPN_PID'][0]],
+            'IPN_PNAME' => [$this['IPN_PNAME'][0]],
+            'IPN_DATE' => preg_replace('/[^\d]/', '', $this['IPN_DATE']),
+            'DATE' => $date,
+        ];
+        $hash = $this->service->hasher->hashArray($check);
+        $this->log->info('Confirmed IPN', [
+            'request'=>$this->getData(),
+            'date'=>$date,
+            'hash'=>$hash
+        ]);
+        return '<EPAYMENT>' . $date . '|' . $hash . '</EPAYMENT>';
+    }
+
+    /**
+     * @throws InstantPaymentNotificationException
+     * @throws \Travelhood\OtpSimplePay\Exception\ConfigException
+     */
+    public function validate()
+    {
+        $this->log->debug('Validating IPN', $this->getData());
+        $data = $this->getData();
+        if (!array_key_exists('CURRENCY', $data)) {
+            $this->log->critical('Invalid request received');
+            throw new InstantPaymentNotificationException('Invalid request received');
+        }
+        $this->service->selectCurrency($data['CURRENCY']);
+        $check = $data;
+        unset($check['HASH']);
+        $hash = $this->service->hasher->hashArray($check);
+        if ($hash != $data['HASH']) {
+            $this->log->critical('Invalid hash received', $this->getData());
+            throw new InstantPaymentNotificationException('Invalid hash received for order '.$this->getOrderRef());
+        }
+        $this->log->info('Validated IPN');
+    }
+
+    /**
+     * @return array
+     */
+    public function getData()
+    {
+        return $_POST;
+    }
+
+    #region getters
+
+    /**
+     * @return string
+     */
     public function getDate()
     {
         return $this['SALEDATE'];
     }
 
+    /**
+     * @return string
+     */
     public function getOrderRef()
     {
         return $this['REFNOEXT'];
     }
 
+    /**
+     * @return string
+     */
     public function getSimplePayRef()
     {
         return $this['REFNO'];
     }
 
+    /**
+     * @return string
+     */
     public function getOrderStatus()
     {
         return $this['ORDERSTATUS'];
     }
 
     #endregion
-
 
 }

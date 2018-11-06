@@ -2,6 +2,8 @@
 
 namespace Travelhood\OtpSimplePay;
 
+use Travelhood\OtpSimplePay\Exception\RequestException;
+
 interface RequestInterface
 {
     const METHOD_GET = 'GET';
@@ -16,6 +18,7 @@ interface RequestInterface
     /**
      * @param string $method
      * @return $this
+     * @throws RequestException
      */
     public function setMethod($method);
 
@@ -28,9 +31,15 @@ interface RequestInterface
     /**
      * @param string $raw
      * @param callable $parser
-     * @return mixed
+     * @return array
+     * @throws RequestException
      */
     public function parse($raw, $parser = null);
 
+    /**
+     * @param string $parser
+     * @return mixed
+     * @throws RequestException
+     */
     public function fetch($parser = null);
 }

@@ -9,11 +9,48 @@ abstract class Instant extends Component
     /** @var array */
     protected $_data;
 
+    protected function _getKeyMap()
+    {
+        return [
+            'REFNO',
+            'RC',
+            'RT',
+            'DATE',
+            'HASH',
+        ];
+    }
+
+    protected function _getHashKey()
+    {
+        return 'HASH';
+    }
+
+    protected function _getDataKey($key)
+    {
+        if (array_key_exists($key, $this->_data)) {
+            return $this->_data[$key];
+        }
+        return null;
+    }
+
+    protected function _getValidResponseCode()
+    {
+        return 0;
+    }
+
+    /**
+     * @return array
+     */
     public function getData()
     {
         return $this->_data;
     }
 
+    /**
+     * @param string $raw
+     * @return array
+     * @throws Exception
+     */
     public function parse($raw)
     {
         $this->log->debug('IDN response: ' . PHP_EOL . $raw);
@@ -27,27 +64,14 @@ abstract class Instant extends Component
             $this->log->critical($body[0]->textContent);
             throw new Exception($body[0]->textContent);
         }
-        //$raw2 = substr($raw, 10, -11); // strip <epayment> tag
         $split = explode('|', $epaymentContent);
         return array_combine($this->_getKeyMap(), $split);
     }
 
-    protected function _getKeyMap()
-    {
-        return [
-            'REFNO',
-            'RC',
-            'RT',
-            'DATE',
-            'HASH',
-        ];
-    }
-
-    protected function _getValidResponseCode()
-    {
-        return 0;
-    }
-
+    /**
+     * @throws Exception
+     * @throws InstantDeliveryNotificationException
+     */
     function validate()
     {
         $key = $this->_getHashKey();
@@ -66,34 +90,33 @@ abstract class Instant extends Component
         $this->log->debug('Validated instant request');
     }
 
-    protected function _getHashKey()
-    {
-        return 'HASH';
-    }
-
+    /**
+     * @return int
+     */
     public function getResponseCode()
     {
         return intval($this->_getDataKey('RC'));
     }
 
-    protected function _getDataKey($key)
-    {
-        if (array_key_exists($key, $this->_data)) {
-            return $this->_data[$key];
-        }
-        return null;
-    }
-
+    /**
+     * @return string
+     */
     public function getResponseText()
     {
         return $this->_getDataKey('RT');
     }
 
+    /**
+     * @return string
+     */
     public function getSimplePayRef()
     {
         return $this->_getDataKey('REFNO');
     }
 
+    /**
+     * @return string
+     */
     public function getDate()
     {
         return $this->_getDataKey('DATE');
