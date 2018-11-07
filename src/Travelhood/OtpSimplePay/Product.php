@@ -54,7 +54,7 @@ class Product implements ProductInterface
      * @param float $vat
      */
     public function __construct(
-        $name,
+        $name = null,
         /** @noinspection PhpUnusedParameterInspection */
         $code = null,
         /** @noinspection PhpUnusedParameterInspection */
@@ -69,7 +69,9 @@ class Product implements ProductInterface
             $this->fromArray($name);
         } else {
             foreach (self::VALID_FIELDS as $f => $d) {
-                $this->{'_' . $f} = $$f;
+                if($$f !== null) {
+                    $this->{'_' . $f} = $$f;
+                }
             }
         }
     }
