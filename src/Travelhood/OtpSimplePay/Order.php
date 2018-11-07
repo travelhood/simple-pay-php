@@ -357,7 +357,7 @@ class Order extends Component implements OrderInterface
      */
     public function validate()
     {
-        foreach (['orderRef', 'pricesCurrency', 'payMethod', 'language'] as $k) {
+        foreach (['orderRef', 'payMethod', 'language'] as $k) {
             if (!$this->{'_' . $k}) {
                 throw new OrderException('Missing field: ' . $k);
             }
