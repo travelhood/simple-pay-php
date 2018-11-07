@@ -352,29 +352,26 @@ class Order extends Component implements OrderInterface
     }
 
     /**
+     * @throws Exception\ProductException
      * @throws OrderException
-     * @return $this
+     * @return $this|OrderInterface
      */
     public function validate()
     {
-        foreach (['orderRef', 'payMethod', 'language'] as $k) {
-            if (!$this->{'_' . $k}) {
-                throw new OrderException('Missing field: ' . $k);
+        foreach(self::VALIDATE_FIELDS as $field => $validator) {
+            $fl = strlen($this->{'_'.$field});
+            if($validator['required'] && $fl < 1) {
+                throw new OrderException('Missing field: ' . $field);
             }
-        }
-        foreach (['FirstName', 'LastName', 'Phone', 'Email', 'Address', 'ZipCode', 'City', 'State', 'CountryCode'] as $k1) {
-            foreach (['bill', 'delivery'] as $k2) {
-                if ($k1 == 'Email' && $k2 == 'delivery') {
-                    continue;
-                }
-                $k = $k2 . $k1;
-                if (!$this->{'_' . $k}) {
-                    throw new OrderException('Missing field: ' . $k);
-                }
+            if($fl > $validator['length']) {
+                $this->{'_'.$field} = substr($this->{'_'.$field}, 0, $validator['length']);
             }
         }
         if ($this->products->count() < 1) {
             throw new OrderException('No product specified');
+        }
+        foreach($this->products as $product) {
+            $product->validate();
         }
         return $this;
     }
