@@ -36,11 +36,15 @@ class Back extends Page
                 $this->log->critical(self::KEY_ORDER_CURRENCY . ' must be passed along in the url');
                 throw new PageException(self::KEY_ORDER_CURRENCY . ' must be passed along in the url');
             }
-            $port = $_SERVER['SERVER_PORT'];
+            if(array_key_exists('HTTP_X_FORWARDED_PORT', $_SERVER)) {
+                $port = intval($_SERVER['HTTP_X_FORWARDED_PORT']);
+            } else {
+                $port = intval($_SERVER['SERVER_PORT']);
+            }
             if ($port == 80 || $port == 443) {
                 $port = '';
             } else {
-                $port = ':' . $port;
+                $port = ':'.$port;
             }
             $protocol = 'http';
             if (array_key_exists('HTTP_X_FORWARDED_PROTO', $_SERVER)) {
